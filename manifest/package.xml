@@ -6,6 +6,14 @@
     </types>
     <types>
         <members>*</members>
+        <name>CustomObject</name>
+    </types>
+        <types>
+        <members>*</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>*</members>
         <name>ApexComponent</name>
     </types>
     <types>
@@ -31,6 +39,10 @@
     <types>
         <members>*</members>
         <name>StaticResource</name>
+    </types>
+     <types>
+        <members>Sales Agent Profile</members> <!-- Profile API name without `.profile` -->
+        <name>Profile</name>
     </types>
     <version>63.0</version>
 </Package>
