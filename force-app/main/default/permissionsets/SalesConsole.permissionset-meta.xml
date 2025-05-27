@@ -4,6 +4,7 @@
         <application>standard__LightningSalesConsole</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <description>This will set the access to the SALES CONSOLE only</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>SalesConsole</label>
 </PermissionSet>
