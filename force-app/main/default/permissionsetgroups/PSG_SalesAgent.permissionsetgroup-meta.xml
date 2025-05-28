@@ -6,6 +6,8 @@
     <permissionSets>Contact_CRED</permissionSets>
     <permissionSets>Lead_CRED</permissionSets>
     <permissionSets>Opportunity_CRED</permissionSets>
-    <permissionSets>SalesConsole</permissionSets>
+    <permissionSets>PriceBook_Read</permissionSets>
+    <permissionSets>Product_Read</permissionSets>
+    <permissionSets>Sales_Console_Access</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>
