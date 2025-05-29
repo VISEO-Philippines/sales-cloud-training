@@ -1,5 +1,5 @@
 @isTest
-public class LeadConverterHandlerTest {
+public class LeadTriggerTest {
     @isTest
     static void testConvertHotWebLeads() {
         // Create a test Lead

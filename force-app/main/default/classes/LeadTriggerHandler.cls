@@ -1,4 +1,4 @@
-public with sharing class LeadConverterHandler {
+public with sharing class LeadTriggerHandler {
 	public static void convertHotWebLeads(List<Lead> leads) {
         List<Database.LeadConvert> leadConverts = new List<Database.LeadConvert>();
 
