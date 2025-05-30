@@ -1,4 +1,4 @@
-public with sharing class PrimaryContactRoleOnOpportunityHandler {
+public with sharing class OpportunityTriggerHandler {
     public static void createOpportunityContactRole(List<Opportunity> opps) {
         // Map of AccountId to list of Contacts
         Map<Id, List<Contact>> accountContactsMap = new Map<Id, List<Contact>>();

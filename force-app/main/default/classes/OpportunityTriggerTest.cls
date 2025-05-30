@@ -1,5 +1,5 @@
 @isTest
-private class PrimaryContactRoleOnOpportunityTest {
+private class OpportunityTriggerTest {
 
     @testSetup
     static void setupData() {
