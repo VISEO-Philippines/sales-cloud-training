@@ -1,5 +1,5 @@
 @isTest
-private class AutoConvertLeadsTest {
+private class LeadTriggerHandlerTest {
 
     @isTest
     static void testConvertLead() {
