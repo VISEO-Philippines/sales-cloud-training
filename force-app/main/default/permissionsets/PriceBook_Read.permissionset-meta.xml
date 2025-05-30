@@ -24,4 +24,8 @@
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <tabSettings>
+        <tab>standard-Pricebook2</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>
