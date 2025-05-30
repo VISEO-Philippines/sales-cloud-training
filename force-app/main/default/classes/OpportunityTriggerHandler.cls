@@ -2,11 +2,14 @@ public with sharing class OpportunityTriggerHandler {
 
     public static void addPrimaryContactRole(List<Opportunity> newOpportunityList) {
         List<OpportunityContactRole> contactRolesToInsertList = new List<OpportunityContactRole>();
+        List<Opportunity> oppWithAccounts = new List<Opportunity>();
+        
         // store the account Id to set [unique]
         Set<Id> accIds = new Set<Id>();
         for(Opportunity opp : newOpportunityList) {
             if(opp.AccountId != null) {
                 accIds.add(opp.AccountId);
+                oppWithAccounts.add(opp);
             }
         }
 
@@ -29,14 +32,13 @@ public with sharing class OpportunityTriggerHandler {
             System.debug('Error occurred during query: ' + e.getMessage());
         }
 
-        for(Opportunity oppVar : newOpportunityList) {
+        for(Opportunity oppVar : oppWithAccounts) {
             Id primaryAccId = accountIdContactIdMap.get(oppVar.AccountId);
-            System.debug('primaryAccId: ' + primaryAccId);
             // if the opportunity has an account and the account is in the map, create a contact role
             // and add it to the list of contact roles to insert
             // this will ensure that only one contact role is created per account
             // and the first contact found for that account will be used
-            if(oppVar.AccountId != null && accountIdContactIdMap.containsKey(oppVar.AccountId)) {
+            if(accountIdContactIdMap.containsKey(oppVar.AccountId)) {
                 OpportunityContactRole conRole = new OpportunityContactRole(
                     OpportunityId = oppVar.Id,
                     ContactId = primaryAccId, 
