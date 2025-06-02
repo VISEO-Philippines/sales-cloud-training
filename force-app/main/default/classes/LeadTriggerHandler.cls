@@ -1,5 +1,5 @@
 public with sharing class LeadTriggerHandler {
-    
+
     public static void convertLeads(List<Lead> leadsToConvertList) {
         // store the lead which will be converted
         List<Lead> filteredLeads = new List<Lead>();
@@ -9,6 +9,10 @@ public with sharing class LeadTriggerHandler {
             if(lds.LeadSource == 'Web' && lds.Rating == 'Hot') {
                 filteredLeads.add(lds);
             }
+        }
+
+        if(filteredLeads.isEmpty()) {
+            return;
         }
 
         // list of lead records to convert
@@ -25,7 +29,7 @@ public with sharing class LeadTriggerHandler {
         // conversion if the list is not empty
         if (!leadConvertList.isEmpty()) {
             List<Database.LeadConvertResult> leadConvertResultList =  Database.convertLead(leadConvertList);
-            
+
             // checking if the lead converting was successful
             for(Database.LeadConvertResult lcrVar : leadConvertResultList) {
                 if(lcrVar.isSuccess()) {
