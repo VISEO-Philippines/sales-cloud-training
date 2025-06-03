@@ -32,7 +32,7 @@ private class OpportunityTriggerHandlerTest {
 
         Test.startTest();
             OpportunityTriggerHandler.createOpportunityContactRole(testOpportunities);
-            List<OpportunityContactRole> ocrResult = [SELECT Id FROM OpportunityContactRole WHERE OpportunityId IN:testOpportunities LIMIT 5];
+            List<OpportunityContactRole> ocrResult = [SELECT Id FROM OpportunityContactRole WHERE OpportunityId IN:testOpportunities];
             System.assertEquals(5, ocrResult.size(), '5 Opportunity Contact Roles should be created (1 per Opportunity');
         Test.stopTest();
     }
