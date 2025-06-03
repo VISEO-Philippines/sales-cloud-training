@@ -25,7 +25,7 @@ private class AccountTriggerHandlerTest {
         AccountTriggerHandler.createContactWithAccountName(testAccounts);
         Test.stopTest();
 
-        LIST<Task> result = [SELECT Id FROM Task WHERE WhatId IN :testAccounts LIMIT 1];
+        LIST<Task> result = [SELECT Id FROM Task WHERE WhatId IN :testAccounts];
         System.assertEquals(1, result.size(), 'A Task has been created for the inserted Account');
     }
 }
