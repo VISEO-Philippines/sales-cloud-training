@@ -14,7 +14,6 @@ public class LeadTriggerHandler {
 
             if(!leadConvertList.isEmpty()){
                 List<Database.LeadConvertResult> leadConvertResultList = Database.convertLead(leadConvertList);
-                System.debug('Lead converted: ' + leadConvertResultList);
             }
         }
     }
