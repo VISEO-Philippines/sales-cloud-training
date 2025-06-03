@@ -18,7 +18,7 @@ private class LeadTriggerHandlerTest {
         update newLeadRec;
         Test.stopTest();
 
-        List<Contact> result = [SELECT Id, Name FROM Contact WHERE FirstName = 'Keira' AND LastName = 'Bantot' LIMIT 1];
+        List<Contact> result = [SELECT Id, Name FROM Contact WHERE FirstName = 'Keira' AND LastName = 'Bantot'];
         System.assertEquals(1, result.size(), 'These should be 1 Contact Created after Convertion');
     
     }
@@ -49,7 +49,7 @@ private class LeadTriggerHandlerTest {
         LeadTriggerHandler.checkForConvertedLeads(testLeadList, oldLeadsMap);
         Test.stopTest();
 
-        List<Contact> result = [SELECT Id, Name, Converted_From_Lead__c FROM Contact WHERE FirstName = 'Keira' AND LastName = 'Bantot' LIMIT 1];
+        List<Contact> result = [SELECT Id, Name, Converted_From_Lead__c FROM Contact WHERE FirstName = 'Keira' AND LastName = 'Bantot'];
         System.assertEquals(1, result.size(), 'These should be 1 Contact Created after Convertion with Lead Id of: ' + result[0].Converted_From_Lead__c);
     
     }

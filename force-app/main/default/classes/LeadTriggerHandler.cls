@@ -14,7 +14,6 @@ public class LeadTriggerHandler {
 
             if(!leadConvertList.isEmpty()){
                 List<Database.LeadConvertResult> leadConvertResultList = Database.convertLead(leadConvertList);
-                System.debug('Lead converted: ' + leadConvertResultList);
             }
         }
     }
@@ -25,14 +24,10 @@ public class LeadTriggerHandler {
     Map<Id, Id> contactIdFromConversion = new Map<Id, Id>();
      
         for(Lead cLeads : convertedLeadsList) {
-            System.debug('Check List' + cLeads);
-            System.debug('Check List' + oldLeadsMap.get(cLeads.Id));
 
             if(cLeads.IsConverted && oldLeadsMap.get(cLeads.Id).ConvertedContactId == null && cLeads.ConvertedContactId != null){
                 convertedFromLeads.add(cLeads.ConvertedContactId);
-                System.debug('Converted Contact Id' + cLeads.ConvertedContactId);
-                contactIdFromConversion.put(cLeads., cLeads.Id);
-				System.debug('Converted Contact Id' + cLeads.IdConvertedContactId);	
+                contactIdFromConversion.put(cLeads.ConvertedContactId, cLeads.Id);	
             }
         }
         
