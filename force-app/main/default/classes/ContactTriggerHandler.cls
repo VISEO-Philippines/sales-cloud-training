@@ -8,7 +8,7 @@ public with sharing class ContactTriggerHandler {
             Task taskInsert = new Task();
             taskInsert.OwnerId = con.OwnerId;
             taskInsert.Status = 'Not Started';
-            taskInsert.Subject = 'Follow up with contact ' + con.FirstName + ' ' + con.LastName; 
+            taskInsert.Subject = 'Follow up with Account: ' + con.AccountId; 
             taskInsert.WhoId = con.Id;
             taskInsert.WhatId = con.AccountId;
             taskInsert.Priority = 'Normal';
