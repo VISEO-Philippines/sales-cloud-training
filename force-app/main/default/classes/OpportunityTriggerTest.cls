@@ -27,10 +27,11 @@ private class OpportunityTriggerTest {
         // Run test
         Test.startTest();
         List<OpportunityContactRole> roles = [SELECT ContactId, OpportunityId, IsPrimary 
-                                            FROM OpportunityContactRole 
-                                            WHERE OpportunityId = :opp.Id];
+                                            FROM OpportunityContactRole];
+        Contact con = [SELECT Id FROM Contact WHERE AccountId = :acc.Id];
         System.assertEquals(1, roles.size(), 'One OpportunityContactRole should be created');
         System.assertEquals(true, roles[0].IsPrimary, 'The contact role should be primary');
+        System.assertEquals(con.Id, roles[0].ContactId, 'The OpportunityContactRole should be linked to the Contact');
         Test.stopTest();
     }
 }

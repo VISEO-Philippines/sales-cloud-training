@@ -1,39 +1,40 @@
 public with sharing class OpportunityTriggerHandler {
     public static void createOpportunityContactRole(List<Opportunity> opportunities) {
         Set<Id> relatedAccountIds = new Set<Id>();
-
-        //Get account Ids of Triggering Opps
+        List<Opportunity> oppList = new List<Opportunity>();
+        
         for (Opportunity opp : opportunities) {
-            relatedAccountIds.add(opp.AccountId);
-        }
-        
-
-        //Map to store the related accounts contacts
-        Map<Id, List<Contact> > accountIdToContactsMap = new Map<Id, List<Contact>>();
-
-        for (Account acc : [SELECT Id, (SELECT Id FROM Contacts) FROM Account WHERE Id IN :relatedAccountIds]) {
-            accountIdToContactsMap.put(acc.Id, acc.Contacts);
-        }
-        
-        //assign OpportunityContactRoles to Opps
-        List<OpportunityContactRole> newOppConRoles = new List<OpportunityContactRole>();
-
-        for(Opportunity opp : opportunities) {
-            //if opp has a related account and account has contacts, add the contacts as OpportunityContactRoles
-            if(opp.AccountId != null && accountIdToContactsMap.containsKey(opp.AccountId)){
-                for(Contact con : accountIdToContactsMap.get(opp.AccountId)){
-                    newOppConRoles.add(new OpportunityContactRole(
-                        OpportunityId = opp.Id,
-                        ContactId = con.Id,
-                        isPrimary = true
-                    ));
-                    System.debug('Opportunity Contact Role:' + newOppConRoles);             
-                }
-
+            if (opp.AccountId != null) {
+                relatedAccountIds.add(opp.AccountId);
+                oppList.add(opp);
             }
         }
-            if(newOppConRoles.size() > 0) {
-                insert newOppConRoles;
+        
+        // Map to store the related account's first contact
+        Map<Id, Contact> accountIdToContactsMap = new Map<Id, Contact>();
+
+        // Query the contacts of each account (1 contact per account)
+        for (Account acc : [SELECT Id, (SELECT Id FROM Contacts LIMIT 1) FROM Account WHERE Id IN :relatedAccountIds]) {
+            for (Contact con : acc.Contacts) {
+                accountIdToContactsMap.put(acc.Id, con);
             }
+        }
+
+        // Assign OpportunityContactRoles to Opps
+        List<OpportunityContactRole> newOppConRole = new List<OpportunityContactRole>();
+        
+        for(Opportunity opp : oppList) {
+            if(accountIdToContactsMap.containsKey(opp.AccountId)) {
+                newOppConRole.add(new OpportunityContactRole(
+                    OpportunityId = opp.Id,
+                    ContactId =  accountIdToContactsMap.get(opp.AccountId).Id,
+                    IsPrimary = true
+                ));
+            }
+        }
+
+        if (!newOppConRole.isEmpty()) {
+            insert newOppConRole;
+        }
     }
 }
