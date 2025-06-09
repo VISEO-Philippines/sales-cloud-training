@@ -1,5 +1,5 @@
 @isTest
-private class OpportunityScheduleHandlerTest {
+private class OpportunityBatchTest {
 
     @testSetup
     static void testData(){
@@ -15,17 +15,26 @@ private class OpportunityScheduleHandlerTest {
         testOpp.CloseDate = System.today().addDays(30);
         
         insert testOpp;
+
+        Opportunity testOpp2 = new Opportunity();
+        testOpp2.Name = 'Test Opp'; 
+        testOpp2.StageName = 'Closed Won';
+        testOpp2.AccountId = testAccount.Id;
+        testOpp2.CloseDate = System.today().addDays(30);
+        
+        insert testOpp2;
+
     }
 
     @isTest
     static void testBatchExecution() {
         
         Test.startTest();
-            OpportunityScheduleHandler testOppSched = new OpportunityScheduleHandler();
-            Database.executeBatch(testOppSched, 1);
+            OpportunityBatch testOppSched = new OpportunityBatch();
+            Database.executeBatch(testOppSched);
         Test.stopTest();
     
-        Account acc = [SELECT Id, Is_Client__c FROM Account LIMIT 1];
+        Account acc = [SELECT Id, Is_Client__c FROM Account];
         Assert.areEqual(true, acc.Is_Client__c, 'Account.Is_Client__c should be true.');
     }
 }
