@@ -13,25 +13,16 @@ public with sharing class OpportunityTriggerHandler {
             }
         }
 
-        if (accIds.isEmpty()) { 
-            System.debug('accountIds is empty. End');
-            return; 
-        }
-
         // will store only one contact per account
         // loop through opportunity and contacts to match and create a contact role
         Map<Id, Id> accountIdContactIdMap = new Map<Id, Id>();    
-        try {
-            for(Contact conVar : [SELECT Id, AccountId FROM Contact WHERE AccountId IN: accIds]) {
-                // first contact found will be stored in the map
-                if(!accountIdContactIdMap.containsKey(conVar.AccountId)) {
-                    accountIdContactIdMap.put(conVar.AccountId, conVar.Id);
-                }
+        for(Contact conVar : [SELECT Id, AccountId FROM Contact WHERE AccountId IN: accIds]) {
+            // first contact found will be stored in the map
+            if(!accountIdContactIdMap.containsKey(conVar.AccountId)) {
+                accountIdContactIdMap.put(conVar.AccountId, conVar.Id);
             }
-        } catch (QueryException e) {
-            System.debug('Error occurred during query: ' + e.getMessage());
         }
-
+         
         for(Opportunity oppVar : oppWithAccounts) {
             Id primaryAccId = accountIdContactIdMap.get(oppVar.AccountId);
             // if the opportunity has an account and the account is in the map, create a contact role
@@ -50,9 +41,7 @@ public with sharing class OpportunityTriggerHandler {
         }
 
         // insert if there are contact roles inside the list
-        if(!contactRolesToInsertList.isEmpty()) {
-            insert contactRolesToInsertList;
-        }
+        insert contactRolesToInsertList;
 
     }
 }
