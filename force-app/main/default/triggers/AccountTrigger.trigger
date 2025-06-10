@@ -1,5 +1,5 @@
-trigger AccountTrigger on Account (after insert, after update) {
+trigger AccountTrigger on Account (after insert) {
     if (Trigger.isAfter && Trigger.isInsert) {
-        AccountTriggerHandler.handleAfterInsert(Trigger.newMap);
+        AccountTriggerHandler.createContactAndTask(Trigger.newMap);
     }
 }

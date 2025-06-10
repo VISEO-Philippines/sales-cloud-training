@@ -1,46 +1,49 @@
 public with sharing class AccountTriggerHandler {
-    public static void handleAfterInsert(Map<Id, Account> accMap) {
-        
-        List<Task> taskList = new List<Task>();
-        
+
+    public static void createContactAndTask(Map<Id, Account> accMap) {
+        List<Contact> contactsToInsert = createContacts(accMap);
+        insert contactsToInsert;
+
+        List<Task> tasksToInsert = createTasks(accMap.keySet(), contactsToInsert);
+        insert tasksToInsert;
+    }
+
+    private static List<Contact> createContacts(Map<Id, Account> accMap) {
+        List<Contact> contactList = new List<Contact>();
+
         for (Account acc : accMap.values()) {
-            Task task = new Task();
-            task.Subject = 'New Task';
-            task.WhatId = acc.Id;
-            task.OwnerId = acc.OwnerId;
+            contactList.add(new Contact(
+                FirstName = 'acme',
+                LastName = acc.Name,
+                AccountId = acc.Id
+            ));
+        }
 
+        return contactList;
+    }
 
-            if(!acc.Contacts.isEmpty()){
-                task.WhoId = acc.Contacts[0].Id;
+    private static List<Task> createTasks(Set<Id> accountIds, List<Contact> insertedContacts) {
+        List<Task> taskList = new List<Task>();
+        Map<Id, Contact> accountIdToContact = new Map<Id, Contact>();
+
+        for (Contact con : insertedContacts) {
+            accountIdToContact.put(con.AccountId, con);
+        }
+
+        for (Id accId : accountIds) {
+            Task task = new Task(
+                Subject = 'New Task',
+                WhatId = accId,
+                OwnerId = UserInfo.getUserId()
+            );
+
+            if (accountIdToContact.containsKey(accId)) {
+                task.WhoId = accountIdToContact.get(accId).Id;
             }
 
             taskList.add(task);
         }
 
-        if (!taskList.isEmpty()) {
-            insert taskList;
-        }
-    }
-
-    public static void relateTaskToContact(List<Contact> contactList){
-        Set<Id> accountIds = new Set<Id>();
-        for(Contact con : contactList){
-                accountIds.add(con.AccountId);
-            }
-
-        List<Task> taskToUpdate = [
-            SELECT Id, WhatId, WhoId    
-            FROM Task 
-            WHERE WhatId IN :accountIds AND WhoId = null
-        ];
-        
-        for(Account  acc : [SELECT Id, (SELECT Id FROM Contacts LIMIT 1) FROM Account WHERE Id IN :accountIds]){
-            if(!acc.Contacts.isEmpty()){
-                for(Task t : taskToUpdate){
-                    t.WhoId = acc.Contacts[0].Id;
-                }
-            }
-        }
-            update taskToUpdate;
+        return taskList;
     }
 }
