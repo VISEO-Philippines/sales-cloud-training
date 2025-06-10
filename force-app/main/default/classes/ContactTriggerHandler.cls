@@ -1,9 +1,9 @@
 public with sharing class ContactTriggerHandler {
     
-    public static void addAssignTask(List<Contact> conToAssignList) {
+    public static void addAssignTask(List<Contact> conToAssignTaskList) {
         List<Task> tasksToInsert = new List<Task>();
 
-        for(Contact con : conToAssignList) {
+        for(Contact con : conToAssignTaskList) {
             tasksToInsert.add(
                 new Task(
                     OwnerId = con.OwnerId,
