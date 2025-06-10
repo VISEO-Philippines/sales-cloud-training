@@ -1,19 +1,20 @@
 public with sharing class ContactTriggerHandler {
     
-    public static void addAssignTask(List<Contact> newAccountList) {
-        
+    public static void addAssignTask(List<Contact> conToAssignList) {
         List<Task> tasksToInsert = new List<Task>();
 
-        for(Contact con : newAccountList) {
-            Task taskInsert = new Task();
-            taskInsert.OwnerId = con.OwnerId;
-            taskInsert.Status = 'Not Started';
-            taskInsert.Subject = 'Follow up with Account: ' + con.AccountId; 
-            taskInsert.WhoId = con.Id;
-            taskInsert.WhatId = con.AccountId;
-            taskInsert.Priority = 'Normal';
-            taskInsert.ActivityDate = Date.today().addDays(30);
-            tasksToInsert.add(taskInsert);
+        for(Contact con : conToAssignList) {
+            tasksToInsert.add(
+                new Task(
+                    OwnerId = con.OwnerId,
+                    Status = 'Not Started',
+                    Subject = 'Task for ' + con.AccountId, 
+                    WhoId = con.Id,
+                    WhatId = con.AccountId,
+                    Priority = 'Normal',
+                    ActivityDate = Date.today().addDays(30)
+                )
+            );
         }
         insert tasksToInsert;
     }

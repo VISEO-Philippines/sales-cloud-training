@@ -4,11 +4,11 @@ public with sharing class AccountTriggerHandler {
         List<Contact> contactsToInsert = new List<Contact>();
 
         for(Account acc : newAccountToAssignList) {
-            Contact conInsert = new Contact();
-            conInsert.FirstName = 'Default';
-            conInsert.LastName = 'Contact';
-            conInsert.AccountId = acc.Id;
-            contactsToInsert.add(conInsert);
+            contactsToInsert.add(new Contact(
+                FirstName = 'Default',
+                LastName = 'Contact',
+                AccountId = acc.Id
+            ));
         }
         insert contactsToInsert;
     }
