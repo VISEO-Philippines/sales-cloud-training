@@ -1,9 +1,10 @@
 @isTest
 public class LeadTriggerTest {
+
     @isTest
-    static void testConvertHotWebLeads() {
-            // Create a test Lead
-            Lead testLead = new Lead(
+    static void testConvertHotWebLeadsExplicitCall() {
+        // Create a test Lead record
+        Lead testLead = new Lead(
             FirstName = 'Test',
             LastName = 'Lead',
             Company = 'Test Company',
@@ -13,23 +14,26 @@ public class LeadTriggerTest {
         );
         insert testLead;
 
+        // Explicitly call the method 
         Test.startTest();
-        // Trigger will auto-convert this based on your logic
+        LeadTriggerHandler.convertHotWebLeads(new List<Lead>{ testLead });
         Test.stopTest();
-        // Reload the lead and confirm it's converted
-        testLead = [SELECT Id, IsConverted, ConvertedContactId FROM Lead WHERE Id = :testLead.Id];
-        System.assertEquals(testLead.IsConverted, true, 'Lead should now be converted');
 
-        // Re-query the converted contact
+        //Re-query to assert conversion
+        testLead = [
+            SELECT Id, IsConverted, ConvertedContactId 
+            FROM Lead 
+            WHERE Id = :testLead.Id
+        ];
+        System.assertEquals(true, testLead.IsConverted, 'Lead should be converted');
+
+        //Validate contact update
         Contact convertedContact = [
             SELECT Id, Converted_From_Lead__c 
             FROM Contact 
             WHERE Id = :testLead.ConvertedContactId
         ];
-
-        // Assert the custom field is populated correctly
         System.assertEquals(testLead.Id, convertedContact.Converted_From_Lead__c, 
             'Converted contact should reference the original lead ID.');
     }
-   
 }
