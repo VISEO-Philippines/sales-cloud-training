@@ -1,6 +1,6 @@
 global with sharing class OpportunityBatch implements Database.Batchable<SObject> {
     global Database.QueryLocator start(Database.BatchableContext BC) { 
-        return Database.getQueryLocator([SELECT Id, StageName, AccountId FROM Opportunity WHERE StageName = 'Closed Won']);
+        return Database.getQueryLocator([SELECT Id, StageName, AccountId, Account.Is_Client__c FROM Opportunity WHERE StageName = 'Closed Won' AND Account.Is_Client__c = false]);
     }
 
     global void execute(Database.BatchableContext bc, List<Opportunity> oppList) {
