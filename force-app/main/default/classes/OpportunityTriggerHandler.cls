@@ -4,7 +4,7 @@ public with sharing class OpportunityTriggerHandler {
         // get user profile name
         String profileName = [SELECT Id, Name FROM Profile WHERE Id =: UserInfo.getProfileId()].Name;
 
-        // if user is system admin or sales user, allow opportunity deletion
+        // if user is system admin, allow opportunity deletion
         if(profileName == 'System Administrator') {
             for(Opportunity opp : oppToDeleteList) {
                 if(opp.StageName == 'Closed Won') {
