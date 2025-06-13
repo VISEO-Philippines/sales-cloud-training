@@ -56,8 +56,8 @@ public with sharing class LeadTriggerHandler {
     }
 
     // ===  Log any failed conversions ===
-    private static void logFailedConversions(List<Database.LeadConvertResult> results) {
-        for (Database.LeadConvertResult result : results) {
+    private static void logFailedConversions(List<Database.LeadConvertResult> conversionResults) {
+        for (Database.LeadConvertResult result : conversionResults) {
             if (!result.isSuccess()) {
                 System.debug('Lead conversion failed: ' + result.getErrors());
             }
@@ -65,10 +65,10 @@ public with sharing class LeadTriggerHandler {
     }
 
     // ===  Update converted Contact records ===
-    private static void updateConvertedContacts(List<Database.LeadConvertResult> results, Map<Id, Lead> originalLeads) {
+    private static void updateConvertedContacts(List<Database.LeadConvertResult> conversionResults, Map<Id, Lead> originalLeads) {
         List<Contact> contactsToUpdate = new List<Contact>();
 
-        for (Database.LeadConvertResult result : results) {
+        for (Database.LeadConvertResult result : conversionResults) {
             if (result.isSuccess()) {
                 Id leadId = result.getLeadId();
                 Id contactId = result.getContactId();
