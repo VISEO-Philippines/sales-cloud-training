@@ -3,9 +3,6 @@ private class OpportunityHandlerTest {
 
     @isTest
     static void sendEmailNotificationTest() {
-        // User testUser = [SELECT Id, Email, FirstName, LastName FROM User WHERE Profile.Name = 'Standard User' LIMIT 1];
-        // insert testUser;
-
         Account testAccount = new Account(
             Name = 'Test Account'
         );
