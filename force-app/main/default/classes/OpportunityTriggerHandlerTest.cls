@@ -22,12 +22,10 @@ private class OpportunityTriggerHandlerTest {
 
         testOpportunity.StageName = 'Proposal/Price Quote';
 
-
         Test.startTest();
             OpportunityTriggerHandler.taskCreateOnStageProposal(new List<Opportunity>{testOpportunity}, oldOppMap);
         Test.stopTest();
 
-        // Verify the behavior of the method
         List<Task> createdTasks = [
             SELECT Id, Subject, ActivityDate, OwnerId, WhatId, Status
             FROM Task
