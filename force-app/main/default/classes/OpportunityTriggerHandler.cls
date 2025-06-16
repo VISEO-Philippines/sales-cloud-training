@@ -11,7 +11,7 @@ public with sharing class OpportunityTriggerHandler {
                 opportunityAccountIds.add(opp.AccountId);
             }
         }
-        List<Contact> contactList = [SELECT Id, AccountId FROM Contact WHERE AccountId IN : opportunityAccountIds];
+        List<Contact> contactList = [SELECT Id, AccountId FROM Contact WHERE AccountId IN : opportunityAccountIds LIMIT 1];
 
         for(Contact con :contactList) {
             opportunityContactRolesList.add(
