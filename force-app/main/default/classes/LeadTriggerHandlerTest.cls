@@ -20,7 +20,7 @@ private class LeadTriggerHandlerTest {
         Test.stopTest();
 
         List<Contact> result = [SELECT Id, Name FROM Contact WHERE FirstName = 'Keira' AND LastName = 'Bantot' LIMIT 1];
-        System.assertEquals(1, result.size(), 'These should be 1 Contact Created after Convertion');
+        assert.AreEqual(1, result.size(), 'These should be 1 Contact Created after Convertion');
     
     }
 }
