@@ -3,10 +3,12 @@ trigger OpportunityTrigger on Opportunity (after insert, after update) {
         if (Trigger.isInsert) {
             OpportunityTriggerHandler.createOpportunityContactRole(Trigger.new);
             OpportunityTriggerHandler.generateTaskForOpportunityOwner(Trigger.new, null); // pass null
+            OpportunityHelperClass.sendEmailAfterOppClosedWonWithSpecificAmount(Trigger.new);
         }
 
         if (Trigger.isUpdate) {
-            OpportunityTriggerHandler.generateTaskForOpportunityOwner(Trigger.new, Trigger.oldMap); // this will now be non-null
+            OpportunityTriggerHandler.generateTaskForOpportunityOwner(Trigger.new, Trigger.oldMap);
+            OpportunityHelperClass.sendEmailAfterOppClosedWonWithSpecificAmount(Trigger.new);
         }
     }
 }
