@@ -18,20 +18,19 @@ public class LeadTriggerHandler {
         }
     }
     
-    public static void checkForConvertedLeads(List<Lead> convertedLeadsList, Map<Id, Lead> oldLeadsMap){
-	Set<Id> convertedFromLeads = new Set<Id>();
+    public static void checkLeadsIfConverted(List<Lead> leadsList, Map<Id, Lead> oldLeadsMap){
+
 	List<Contact> contactsToUpdate = new List<Contact>();
     Map<Id, Id> contactIdFromConversion = new Map<Id, Id>();
      
-        for(Lead cLeads : convertedLeadsList) {
+        for(Lead cLeads : leadsList) {
 
             if(cLeads.IsConverted && oldLeadsMap.get(cLeads.Id).ConvertedContactId == null && cLeads.ConvertedContactId != null){
-                convertedFromLeads.add(cLeads.ConvertedContactId);
                 contactIdFromConversion.put(cLeads.ConvertedContactId, cLeads.Id);	
             }
         }
-        
-        List<Contact> contactFromLead = [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :convertedFromLeads];
+
+        List<Contact> contactFromLead = [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :contactIdFromConversion.keySet()];
         
         for(Contact con : contactFromLead){
             con.Converted_From_Lead__c = contactIdFromConversion.get(con.Id);
