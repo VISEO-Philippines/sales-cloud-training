@@ -4,8 +4,6 @@ private class AccountTriggerHandlerTest {
     @isTest
     static void testCreateContactWithAccountName() {
     
-    List<Account> testAccounts = new List<Account>();
-
         Account testAccount = new Account(
             Name = 'Fujio Residences',
             BillingCity = 'Tokyo',
@@ -18,7 +16,6 @@ private class AccountTriggerHandlerTest {
             Website = 'https://fujio.co.jp/'
             
         );
-        testAccounts.add(testAccount);
         insert testAccounts;
         
         Test.startTest();
