@@ -31,7 +31,7 @@ public with sharing class OpportunityTriggerHandler {
         List<Task> createFollowUpTasksList = new List<Task>(); 
 
         for(Opportunity opp : opportunityList){
-            if(opp.StageName == 'Proposal/Price Quote' && oldOpportunityMap.get(opp.Id).StageName != 'Proposal/Price Quote' && opp.IsWon != TRUE){
+            if(oldOpportunityMap != null && opp.StageName == 'Proposal/Price Quote' && oldOpportunityMap.get(opp.Id).StageName != 'Proposal/Price Quote'){
                         Task reminderTask = new Task(
                         OwnerId = opp.OwnerId,
                         WhatId = opp.Id,
