@@ -44,7 +44,7 @@ public with sharing class OpportunityTriggerHandler {
     for (Opportunity opp : opportunityList) {
 
          if (((mapToOldOpportunity == null || !mapToOldOpportunity.containsKey(opp.Id)) && opp.StageName == 'Proposal/Price Quote') 
-            ||(mapToOldOpportunity != null && mapToOldOpportunity.containsKey(opp.Id) && opp.StageName == 'Proposal/Price Quote' )) {
+            ||(mapToOldOpportunity != null && mapToOldOpportunity.containsKey(opp.Id) && mapToOldOpportunity.get(opp.Id).StageName != 'Proposal/Price Quote' && opp.StageName == 'Proposal/Price Quote' )) {
             System.debug('Creating Task for Opp ID: ' + opp.Id);
             taskList.add(new Task(
                 Subject = 'Follow up call',
