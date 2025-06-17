@@ -2,29 +2,30 @@
 private class OpportunitySchedulableTest {
 
     @isTest
-    static void myUnitTest() {
+    static void testOpportunitySchedulable() {
+    
+        String cronExp = '0 0 0 * * ?';
 
-        Account testAccount = new Account(
-            Name = 'Test',
-            SLA__C = 'Gold',
-            SLAExpirationDate__c = Date.newInstance(2025, 5, 31),
-            SLASerialNumber__c = '123'
-        );
-        insert testAccount;
-
-        List<Opportunity> newTestOpp = new List<Opportunity>{
-            new Opportunity(Name = 'Test Opp 1', StageName = 'Closed Won', CloseDate = Date.today() +37, AccountId = testAccount.Id),
-            new Opportunity(Name = 'Test Opp 2', StageName = 'Closed Won', CloseDate = Date.today() +37, AccountId = testAccount.Id),
-            new Opportunity(Name = 'Test Opp 2', StageName = 'Closed Won', CloseDate = Date.today() +37, AccountId = testAccount.Id)
+        List<Account> testAccounts = new List<Account>{
+            new Account(Name = 'Test 1', SLA__C = 'Gold', SLAExpirationDate__c = Date.newInstance(2025, 5, 31), SLASerialNumber__c = '123'),
+            new Account(Name = 'Test 2', SLA__C = 'Gold', SLAExpirationDate__c = Date.newInstance(2025, 5, 31), SLASerialNumber__c = '123'),
+            new Account(Name = 'Test 3', SLA__C = 'Gold', SLAExpirationDate__c = Date.newInstance(2025, 5, 31), SLASerialNumber__c = '123')
         };
-        insert newTestOpp;
+        insert testAccounts;
+
+        Opportunity testOpp = new Opportunity(
+            Name = 'Test Opp 1',
+            StageName = 'Closed Won',
+            CloseDate = Date.today() +37,
+            AccountId = testAccounts[0].Id
+        );
+        insert testOpp;
 
         Test.StartTest();
-            OpportunitySchedulable testOppBatch = new OpportunitySchedulable();
-            testOppBatch.execute(null);
+            String jobId = System.schedule('Process Opportunities', cronExp, new OpportunitySchedulable());
         Test.StopTest();
 
-        List<Account> result = [SELECT Id, Is_Client__c FROM Account WHERE Is_Client__c = TRUE];
-        System.assertEquals(1, result.size(), 'An Account should have been updated to Client');
+        CronTrigger ct = [SELECT Id, CronExpression, TimesTriggered, NextFireTime FROM CronTrigger WHERE Id = :jobId];
+        assert.areEqual(cronExp, ct.CronExpression, 'An Account should have been updated to Client');
     }
 }

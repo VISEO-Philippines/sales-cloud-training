@@ -1,7 +1,7 @@
 public class OpportunityBatchHandler implements Database.Batchable<SObject> {
     
     public Database.QueryLocator start(Database.BatchableContext bc){
-        return Database.getQueryLocator('SELECT Id, AccountId, Account.Is_Client__c, IsWon FROM Opportunity WHERE IsWon = TRUE');
+        return Database.getQueryLocator('SELECT Id, AccountId FROM Opportunity WHERE Account.Is_Client__c = TRUE');
     }
     
     public void execute(Database.BatchableContext bc, List<Opportunity> oppClientList){
