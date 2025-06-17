@@ -1,6 +1,5 @@
 public with sharing class CaseTriggerHandler {
 
-    // Cache the queue Id to avoid repeated SOQL
     private static Id vipSupportQueueId;
 
     public static void assignHighPriorityCaseToQueue(List<Case> newCases, Map<Id, Case> mapToOldCase) {
@@ -11,13 +10,11 @@ public with sharing class CaseTriggerHandler {
         }
 
         for (Case cs : newCases) {
-            // INSERT: old map is null, so check new case directly
             if (mapToOldCase == null) {
                 if (cs.Priority == 'High') {
                     cs.OwnerId = vipSupportQueueId;
                 }
             }
-            // UPDATE: compare new vs old
             else {
                 Case oldCase = mapToOldCase.get(cs.Id);
                 if (oldCase.Priority != 'High' && cs.Priority == 'High') {
