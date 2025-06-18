@@ -57,10 +57,23 @@ global class OPP_BTCH implements Database.Batchable<SObject> {
             }
         }
 
+       try {
         // Update directly modified list
         if (!accountsToUpdate.isEmpty()) {
-            update accountsToUpdate;
+            Database.SaveResult[] results = Database.update(accountsToUpdate, false);
+            for (Database.SaveResult result : results) {
+                if (!result.isSuccess()) {
+                    for (Database.Error error : result.getErrors()) {
+                        System.debug('Error updating account: ' + error.getMessage());
+                    }
+                }
+            }
         }
+    } catch (DmlException e) {
+        System.debug('DML exception occurred: ' + e.getMessage());
+    }
+
+
     }
 
     global void finish(Database.BatchableContext BC) {

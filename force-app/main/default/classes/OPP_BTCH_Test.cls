@@ -59,4 +59,20 @@ public class OPP_BTCH_Test {
         System.assertEquals('Red', accMapByName.get('Account Red').Opportunity_Status__c);
     }
 
+    @isTest
+    static void testSchedulerExecutesBatch() {
+        Test.startTest();
+        
+        // Run once daily at 12 AM
+        String cron = '0 0 0 * * ? *'; 
+        
+        System.schedule('Test OPP Batch Scheduler', cron, new OPP_BTCH_Scheduler());
+        
+        Test.stopTest();
+
+        //Confirm it was scheduled
+        CronTrigger ct = [SELECT Id, CronJobDetail.Name FROM CronTrigger WHERE CronJobDetail.Name = 'Test OPP Batch Scheduler' LIMIT 1];
+        System.assertEquals('Test OPP Batch Scheduler', ct.CronJobDetail.Name);
+    }
+
 }
