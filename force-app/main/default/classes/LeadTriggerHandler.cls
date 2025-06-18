@@ -1,13 +1,6 @@
 public with sharing class LeadTriggerHandler {
-    // to prevent recursion by using static variable
-    public static boolean hasRun = false;
 
     public static void handleConvertedFromLead(List<Lead> newLeadList, Map<Id, Lead> oldLeadMap) {
-        // check if the lead is executing for the first time
-        if(hasRun) {
-            return;
-        }
-        hasRun = true;
 
         Set<Id> contactIdsToProcess = new Set<Id>();
         // To link the converted lead Ids to the new contact Ids
@@ -37,17 +30,16 @@ public with sharing class LeadTriggerHandler {
                 WHERE Id IN :contactIdsToProcess
             ]);
 
-            for (Id contactId : contactIdsToProcess) {
+            for (Id contactId : existingContacts.keySet()) {
                 Contact relatedContact = existingContacts.get(contactId);
-                if (relatedContact != null && relatedContact.Converted_From_Lead__c == false) {
-                    relatedContact.Converted_From_Lead__c = true;
+                Id leadId = leadIdToConvertedContactId.get(contactId);
+                
+                if(relatedContact != null && relatedContact.Converted_From_Lead__c == null) {
+                    relatedContact.Converted_From_Lead__c = String.valueOf(leadId);
                     contactsToUpdate.add(relatedContact);
                 }
             }
-
-            if(!contactsToUpdate.isEmpty()) {
-                update contactsToUpdate;
-            }
+            update contactsToUpdate;
         }
     }
 }

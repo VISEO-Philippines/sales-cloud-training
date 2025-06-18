@@ -19,8 +19,6 @@ private class LeadTriggerHandlerTest {
         );
         insert testLead;
 
-        LeadTriggerHandler.hasRun = false;
-
         Test.startTest();
             // Lead Conversion
             Database.LeadConvert leadConvert = new Database.LeadConvert();
@@ -39,6 +37,6 @@ private class LeadTriggerHandlerTest {
         Assert.areEqual(true, checkLead.IsConverted, 'Lead should be converted');
 
         Contact convertedContact = [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id =: checkLead.ConvertedContactId];
-        Assert.areEqual(convertedContact.Converted_From_Lead__c, true, 'Converted From Lead should be true');
+        Assert.areEqual(testLead.Id, convertedContact.Converted_From_Lead__c, 'Converted From Lead should be true');
     }
 }

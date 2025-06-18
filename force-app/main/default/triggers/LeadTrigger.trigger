@@ -1,3 +1,5 @@
 trigger LeadTrigger on Lead (after update) {
-    LeadTriggerHandler.handleConvertedFromLead(Trigger.new, Trigger.oldMap);
+    if(Trigger.isAfter && Trigger.isUpdate) {
+        LeadTriggerHandler.handleConvertedFromLead(Trigger.new, Trigger.oldMap);
+    }
 }
