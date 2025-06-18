@@ -7,12 +7,17 @@ public with sharing class ContactTriggerHandler {
         for (Contact con : deletedContacts) {
             accIds.add(con.AccountId);
         }
+        
+        Map<Id, Account> accMap = new Map<Id, Account>([ SELECT Id, Name FROM Account WHERE Id IN :accIds ]);
 
         for (Contact con : deletedContacts) {
+            // to get acc name for each contact
+            String accName = accMap.containsKey(con.AccountId) ? accMap.get(con.AccountId).Name : null;
+
             // to custom event Contact_Delete_Event__e
             contactToPublishList.add(new Contact_Delete_Event__e( 
                 Contact_AccountId__c = con.AccountId,
-                Contact_AccountName__c = con.Account.Name,
+                Contact_AccountName__c = accName,
                 Contact_Email__c = con.Email,
                 Contact_FirstName__c = con.FirstName,
                 Contact_Id__c = con.Id,
@@ -23,7 +28,7 @@ public with sharing class ContactTriggerHandler {
             // to custom object Contact_Delete_Log__c
             contactToLogList.add(new Contact_Delete_Log__c( 
                 AccountId__c = con.AccountId,
-                AccountName__c = con.Account.Name,
+                AccountName__c = accName,
                 Email__c = con.Email,
                 FirstName__c = con.FirstName,
                 Id__c = con.Id,
