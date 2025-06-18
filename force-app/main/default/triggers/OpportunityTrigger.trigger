@@ -7,5 +7,6 @@ trigger OpportunityTrigger on Opportunity (after insert, after update) {
 
     if(trigger.isAfter && trigger.isUpdate){
         OpportunityTriggerHandler.createTaskWhenOppStageProposalPriceQuote(Trigger.new, Trigger.oldMap);
+
     }
 }
