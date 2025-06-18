@@ -1,5 +1,5 @@
 @isTest
-private class OpportunitySchedulableTest {
+private class OppSchedulable_UpdateIsClientFieldTest {
 
     @testSetup
     static void testData(){
@@ -28,13 +28,13 @@ private class OpportunitySchedulableTest {
 
     @isTest
     static void testSchedulable() {
-        Test.startTest();
-            OpportunitySchedulable testOppSched = new OpportunitySchedulable();
-            testOppSched.execute(null);
-        Test.stopTest();
-        
+        String cron = '0 0 0 * * ?'; // Daily at Midnight
 
-        Account acc = [SELECT Id, Is_Client__c FROM Account WHERE Name = 'Test Account' LIMIT 1];
-        Assert.isTrue(acc.Is_Client__c, 'Account.Is_Client__c should be true.');
+        Test.startTest();
+            String jobId = System.schedule('Test Opportunity_OpportunitySplit_Batchable', cron, new OppSchedulable_UpdateIsClientField());
+        Test.stopTest();
+
+        CronTrigger ct = [SELECT Id, CronExpression, TimesTriggered, NextFireTime FROM CronTrigger WHERE Id = :jobId];
+        Assert.areEqual(cron, ct.CronExpression, 'Cron Expression should match passed parameter.');
     }
 }

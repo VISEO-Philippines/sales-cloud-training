@@ -1,9 +1,9 @@
-global with sharing class OpportunityBatch implements Database.Batchable<SObject> {
-    global Database.QueryLocator start(Database.BatchableContext BC) { 
+public with sharing class OppBatch_UpdateIsClientField implements Database.Batchable<SObject> {
+    public Database.QueryLocator start(Database.BatchableContext BC) { 
         return Database.getQueryLocator([SELECT Id, StageName, AccountId, Account.Is_Client__c FROM Opportunity WHERE StageName = 'Closed Won' AND Account.Is_Client__c = false]);
     }
 
-    global void execute(Database.BatchableContext bc, List<Opportunity> oppList) {
+    public void execute(Database.BatchableContext bc, List<Opportunity> oppList) {
         Map<Id, Account> accToUpdateMap = new Map<Id, Account>();
 
         for (Opportunity opp : oppList) {
@@ -20,7 +20,7 @@ global with sharing class OpportunityBatch implements Database.Batchable<SObject
         }
     }
 
-    global void finish(Database.BatchableContext BC) {
+    public void finish(Database.BatchableContext BC) {
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
         mail.setToAddresses(new String[] {'mico.calingasan@viseo.com'});
         mail.setSubject('Batch Job Complete');

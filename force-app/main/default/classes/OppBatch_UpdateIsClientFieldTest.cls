@@ -1,5 +1,5 @@
 @isTest
-private class OpportunityBatchTest {
+private class OppBatch_UpdateIsClientFieldTest {
 
     @testSetup
     static void testData(){
@@ -30,7 +30,7 @@ private class OpportunityBatchTest {
     static void testBatchExecution() {
         
         Test.startTest();
-            OpportunityBatch testOppSched = new OpportunityBatch();
+            OppBatch_UpdateIsClientField testOppSched = new OppBatch_UpdateIsClientField();
             Database.executeBatch(testOppSched);
         Test.stopTest();
     
