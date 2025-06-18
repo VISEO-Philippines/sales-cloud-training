@@ -59,4 +59,11 @@ public with sharing class OpportunityTriggerHandler {
         insert taskList;
 }
 
+    public static void preventDeleteOfClosedWonOpportunities(List<Opportunity> opportunityList){
+        for (Opportunity opp : opportunityList) {
+            if (opp.StageName == 'Closed Won') {
+                opp.addError('You can\'t delete Opportunity with StageName: Closed Won');
+            }
+        } 
+    }
 }

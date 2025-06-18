@@ -85,5 +85,23 @@ private class OpportunityTriggerTest {
             System.assertEquals(Date.today().addDays(3), tasks[0].ActivityDate, 'Task due date should be 3 days from today');
         }
     }
+    
 
+    @isTest
+    static void deleteClosedWonOpportunityTest() {
+        Opportunity opp = new Opportunity(
+                    Name = 'Test Opp',
+                    StageName = 'Closed Won',
+                    CloseDate = Date.today()
+                    );
+        insert opp;
+        
+        Test.startTest();
+        Database.DeleteResult result = Database.delete(opp, false);
+        Test.stopTest();
+        
+        System.assert(!result.isSuccess());
+        System.assert(result.getErrors().size() > 0);
+        System.assertEquals('You can\'t delete Opportunity with StageName: Closed Won', result.getErrors()[0].getMessage());
+    }
 }
