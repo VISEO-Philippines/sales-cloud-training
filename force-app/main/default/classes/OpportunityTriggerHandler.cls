@@ -5,23 +5,8 @@ public with sharing class OpportunityTriggerHandler {
         List<Task> tasksToInsert = new List<Task>();
         
         for(Opportunity opp : oppListToUpdate) {
-            boolean createTask = false;
-
-            // for update
-            if(oldOppMap != null && oldOppMap.containsKey(opp.Id)) {
-                Opportunity oldOpp = oldOppMap.get(opp.Id);
-                if(opp.StageName == 'Proposal/Price Quote' && oldOpp.StageName != 'Proposal/Price Quote') {
-                    createTask = true;
-                }
-            } else {
-                // for insert
-                if(opp.StageName == 'Proposal/Price Quote') {
-                    createTask = true;
-                }
-            }
-
-            if(createTask) {
-                tasksToInsert.add( 
+            if((oldOppMap != null && opp.StageName == 'Proposal/Price Quote') && opp.StageName == 'Proposal/Price Quote' && oldOppMap.get(opp.Id).StageName != 'Proposal/Price Quote') {
+                tasksToInsert.add(
                     new Task(
                         Subject = 'Follow up on Opportunity: ' + opp.Name,
                         OwnerId = opp.OwnerId,
