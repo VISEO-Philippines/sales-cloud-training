@@ -1,5 +1,5 @@
 @isTest
-private class OpportunityHandlerTest {
+private class OpportunityTriggerHandlerTest {
 
     @isTest
     static void sendEmailNotificationTest() {
@@ -7,7 +7,7 @@ private class OpportunityHandlerTest {
             Name = 'Test Account'
         );
         insert testAccount;
-        
+
         Opportunity testOpp1 = new Opportunity(
             Name = 'Test Opp 1',
             StageName = 'Closed Won',
@@ -19,18 +19,31 @@ private class OpportunityHandlerTest {
 
         Opportunity testOpp2 = new Opportunity(
             Name = 'Test Opp 2',
-            StageName = 'Closed Won',
+            StageName = 'Qualification',
             Amount = 600000,
             CloseDate = System.today() + 3,
             AccountId = testAccount.Id,
             OwnerId = UserInfo.getUserId()
         );
 
-        insert new List<Opportunity>{testOpp1, testOpp2};
+        Opportunity testOpp3 = new Opportunity(
+            Name = 'Test Opp 3',
+            StageName = 'Closed Won',
+            Amount = 600000,
+            CloseDate = System.today() + 3,
+            AccountId = testAccount.Id,
+            OwnerId = UserInfo.getUserId()
+        );      
 
         Test.startTest();
-            OpportunityHandler.sendEmailNotification(new List<Id>{testOpp1.Id, testOpp2.Id});     
-            Assert.areEqual(1, Limits.getEmailInvocations(), 'sendEmail should be called once');  
+            // Insert opportunities
+            insert new List<Opportunity>{testOpp1, testOpp2, testOpp3};
+
+            // update testOpp2; 
+            testOpp2.StageName = 'Closed Won';
+            update testOpp2;
+
+            Assert.areEqual(2, Limits.getEmailInvocations(), 'sendEmail should be called twice');    
         Test.stopTest();
     }
 }

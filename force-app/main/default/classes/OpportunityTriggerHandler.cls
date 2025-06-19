@@ -1,9 +1,17 @@
-public with sharing class OpportunityHandler {
-    public static void sendEmailNotification(List<Id> oppIds) {
+public with sharing class OpportunityTriggerHandler {
+    public static void sendEmailNotification(List<Opportunity> oppListToCheck, Map<Id, Opportunity> oldOppMap) {
+        // get opp ids closed won
+        List<Id> oppIds = new List<Id>();
+        for (Opportunity opp : oppListToCheck) {
+            if ((opp.StageName == 'Closed Won' && oldOppMap == null) || (opp.StageName == 'Closed Won' && oldOppMap.get(opp.Id).StageName != 'Closed Won')) {
+                oppIds.add(opp.Id); 
+            }
+        }
+
         List<Opportunity> oppClosedWon = [
-            SELECT Id, Name, Amount, StageName, Owner.Email, Owner.FirstName, Owner.LastName
+            SELECT Id, Name, Amount, Owner.Email, Owner.FirstName, Owner.LastName
             FROM Opportunity
-            WHERE Id IN :oppIds AND StageName = 'Closed Won' AND Amount > 500000    
+            WHERE Id IN :oppIds AND Amount > 500000    
         ];
 
         List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
