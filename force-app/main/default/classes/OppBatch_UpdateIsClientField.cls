@@ -1,0 +1,30 @@
+public with sharing class OppBatch_UpdateIsClientField implements Database.Batchable<SObject> {
+    public Database.QueryLocator start(Database.BatchableContext BC) { 
+        return Database.getQueryLocator([SELECT Id, StageName, AccountId, Account.Is_Client__c FROM Opportunity WHERE StageName = 'Closed Won' AND Account.Is_Client__c = false]);
+    }
+
+    public void execute(Database.BatchableContext bc, List<Opportunity> oppList) {
+        Map<Id, Account> accToUpdateMap = new Map<Id, Account>();
+
+        for (Opportunity opp : oppList) {
+            if (opp.AccountId != null) {
+                if(accToUpdateMap.containsKey(opp.AccountId)) {
+                    continue; // Skip if already processed
+                }
+                accToUpdateMap.put(opp.AccountId, new Account(Id = opp.AccountId, Is_Client__c = true));
+            }
+        }
+
+        if (!accToUpdateMap.isEmpty()) {
+            update accToUpdateMap.values();
+        }
+    }
+
+    public void finish(Database.BatchableContext BC) {
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setToAddresses(new String[] {'mico.calingasan@viseo.com'});
+        mail.setSubject('Batch Job Complete');
+        mail.setPlainTextBody('The batch job has completed successfully.');
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+    }
+}
