@@ -1,6 +1,14 @@
 public with sharing class CaseTriggerHandler {
-    public static void caseAssignHighPriority(List<Case> caseList) {
-        // Creating a VIP Support Queue group for high-priority case assignment
+    public static void caseAssignHighPriority(List<Case> caseList, Map<Id, Case> oldCaseMap) {
+        
+        List<Case> highPrioCases = new List<Case>();
+        for(Case cs : caseList) {
+            if(cs.Priority == 'High' && (oldCaseMap == null || oldCaseMap.get(cs.Id) == null || oldCaseMap.get(cs.Id).Priority != 'High')) {
+                highPrioCases.add(cs);
+            }
+        }
+        
+        // VIP Support Queue group for high-priority case assignment
         Group vipQueue = [
             SELECT Id
             FROM Group
@@ -8,10 +16,8 @@ public with sharing class CaseTriggerHandler {
         ];
 
         // assigning case to the VIP Support Queue for high-priority cases
-        for (Case cs : caseList) {
-            if (cs.Priority == 'High') {
-                cs.OwnerId = vipQueue.Id;
-            }
+        for(Case cs : highPrioCases) {
+            cs.OwnerId = vipQueue.Id;
         }
     }
 }

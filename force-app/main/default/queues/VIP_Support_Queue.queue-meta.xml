@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This is for &apos;High Priority&apos; Cases</description>
+    <doesSendEmailToMembers>false</doesSendEmailToMembers>
+    <name>VIP Support Queue</name>
+    <queueMembers>
+        <users>
+            <user>mc@aqua.com</user>
+            <user>sales.agent@aqua.com</user>
+        </users>
+    </queueMembers>
+    <queueSobject>
+        <sobjectType>Case</sobjectType>
+    </queueSobject>
+</Queue>

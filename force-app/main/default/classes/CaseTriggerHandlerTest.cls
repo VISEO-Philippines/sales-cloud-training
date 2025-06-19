@@ -3,14 +3,10 @@ private class CaseTriggerHandlerTest {
 
     @isTest
     static void caseAssignHighPriorityTest() {
-        // Creating a VIP Support Queue group for high-priority case assignment
-        Group testGroup = new Group (
-            Name = 'VIP Support Queue',
-            Type = 'Queue'
-        );
-        insert testGroup;
-
-        QueueSObject testQueue = new QueueSObject(QueueID = testGroup.id, SObjectType = 'Case');
+        // retrieve the actual Group Id for the 'VIP Support Queue'
+        Id vipQueueId = [SELECT Id FROM Group WHERE Name = 'VIP Support Queue' AND Type = 'Queue' LIMIT 1].Id;
+        
+        QueueSObject testQueue = new QueueSObject(QueueID = vipQueueId, SObjectType = 'Case');
         insert testQueue;
 
         System.runAs(new User(Id = UserInfo.getUserId())) {
@@ -25,16 +21,27 @@ private class CaseTriggerHandlerTest {
                     Origin   = 'Phone',
                     Priority = 'Medium'
                 );
+                Case testCase3 = new Case(
+                    Subject  = 'Test Case 3',
+                    Origin   = 'Phone',
+                    Priority = 'Medium'
+                );
+                
+                insert new List<Case>{testCase1, testCase2, testCase3};
+                
+                testCase3.Priority = 'High';
+                update testCase3;
 
-                insert testCase1;
-                insert testCase2;
             Test.stopTest();
-
-            Case caseResult1 = [SELECT OwnerId, Priority FROM Case WHERE Id = :testCase1.Id];
-            Assert.areEqual(testGroup.Id, caseResult1.OwnerId, 'High-priority case was not assigned to the VIP queue as expected.');
-
-            Case caseResult2 = [SELECT OwnerId, Priority FROM Case WHERE Id = :testCase2.Id];
-            Assert.areNotEqual(testGroup.Id, caseResult2.OwnerId, 'Medium case was not assigned to the VIP queue as expected.');
+            
+            List<Case> cases = [SELECT Id, OwnerId, Priority FROM Case];
+            for(Case cs : cases) {
+                if(cs.Priority == 'High') {
+                    Assert.areEqual(vipQueueId, cs.OwnerId, 'High-priority case was not assigned to the VIP queue.');
+                } else {
+                    Assert.areNotEqual(vipQueueId, cs.OwnerId, 'Non-high-priority case was incorrectly assigned to the VIP queue.');
+                }
+            }
         }
     }
 }
