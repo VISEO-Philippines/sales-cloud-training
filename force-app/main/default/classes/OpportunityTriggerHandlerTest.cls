@@ -27,7 +27,9 @@ private class OpportunityTriggerHandlerTest {
             delete testOpp2;
         Test.stopTest();
 
-        List<Opportunity> deletedOpps = [SELECT Id FROM Opportunity WHERE Id = :testOpp2.Id];
-        Assert.areEqual(0, deletedOpps.size(), 'Opportunity should be deleted.');
+        List<Opportunity> deletedOpps = [SELECT Id, StageName FROM Opportunity];
+
+        Assert.areEqual(1, deletedOpps.size(), 'There should be one Opportunity remaining after deletion.');
+        Assert.areEqual('Closed Won', deletedOpps[0].StageName, 'The remaining Opportunity should be Closed Won.');
     }
 }
