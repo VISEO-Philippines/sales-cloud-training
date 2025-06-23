@@ -30,11 +30,15 @@ private class ContactUtilsTest {
             AccountId = testAccount.Id
         );
         insert testContact;
+        
+        List<Contact> testContactsList = new List<Contact>();
+        testContactsList.add(testContact);
 
-        Test.StartTest();
-            Integer oppCount = ContactUtils.getOppsFromContact();
+        Test.StartTest()    ;
+            ContactUtils.getOppsFromContact(testContactsList);
         Test.StopTest();
 
-        assert.areEqual(testOppsList.size(), oppCount);
+        Integer oppCount = [SELECT COUNT() FROM Opportunity WHERE AccountId =: testAccount.Id];
+        assert.areEqual(3, oppCount, 'Number of Opportunities for this Account');
     }
 }
