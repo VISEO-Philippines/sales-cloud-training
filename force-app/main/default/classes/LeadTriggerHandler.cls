@@ -1,7 +1,7 @@
 public with sharing class LeadTriggerHandler {
-    
-    public static void convertHotWebLeads(List<Lead> leads) {
-        Set<Id> eligibleLeadIds = getEligibleLeadIds(leads);
+
+    public static void convertHotWebLeads(List<Lead> leads, Map<Id, Lead> oldLeadsMap) {
+        Set<Id> eligibleLeadIds = getEligibleLeadIds(leads, oldLeadsMap);
 
         if (eligibleLeadIds.isEmpty()) return;
 
@@ -17,10 +17,12 @@ public with sharing class LeadTriggerHandler {
     }
 
     // === Identify eligible leads ===
-    private static Set<Id> getEligibleLeadIds(List<Lead> leads) {
+    private static Set<Id> getEligibleLeadIds(List<Lead> leads, Map<Id, Lead> oldLeadsMap) {
         Set<Id> leadIds = new Set<Id>();
         for (Lead lead : leads) {
-            if (lead.Rating == 'Hot' && lead.LeadSource == 'Web') {
+            //update and insert context
+            if ((oldLeadsMap == null || oldLeadsMap.containsKey(lead.Id) && oldLeadsMap.get(lead.Id).Rating != 'Hot' && oldLeadsMap.get(lead.Id).LeadSource != 'Web' )
+            || (oldLeadsMap == null && lead.Rating == 'Hot' && lead.LeadSource == 'Web')) {
                 leadIds.add(lead.Id);
             }
         }
@@ -67,14 +69,14 @@ public with sharing class LeadTriggerHandler {
     // ===  Update converted Contact records ===
     private static void updateConvertedContacts(List<Database.LeadConvertResult> conversionResults, Map<Id, Lead> originalLeads) {
         List<Contact> contactsToUpdate = new List<Contact>();
-
+        Lead sourceLead;
         for (Database.LeadConvertResult result : conversionResults) {
             if (result.isSuccess()) {
                 Id leadId = result.getLeadId();
                 Id contactId = result.getContactId();
 
                 if (leadId != null && contactId != null) {
-                    Lead sourceLead = originalLeads.get(leadId);
+                    sourceLead = originalLeads.get(leadId);
                     if (sourceLead != null && sourceLead.LeadSource != null) {
                         contactsToUpdate.add(new Contact(
                             Id = contactId,
