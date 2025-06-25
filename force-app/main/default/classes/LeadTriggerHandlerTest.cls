@@ -18,9 +18,10 @@ private class LeadTriggerHandlerTest {
             LeadSource = 'Web',
             Rating = 'Hot'
         ));
-
-        Test.startTest();
         insert testLeadsToCreateList;
+        
+        Test.startTest();
+            LeadTriggerHandler.convertLeads(testLeadsToCreateList);
         Test.stopTest();
 
         List<Lead> convertedLeadsList = [SELECT Id, IsConverted, ConvertedAccountId, ConvertedContactId, ConvertedOpportunityId FROM Lead WHERE Id IN :testLeadsToCreateList];
@@ -54,20 +55,31 @@ private class LeadTriggerHandlerTest {
         );
         insert testLead;
 
+        // map to create an old state
+        Map<Id, Lead> oldLeadMap = new Map<Id, Lead>();
+        oldLeadMap.put(testLead.Id, testLead.clone());
+
         Test.startTest();
             // Lead Conversion
             Database.LeadConvert leadConvert = new Database.LeadConvert();
             leadConvert.setLeadId(testLead.Id);
             leadConvert.setConvertedStatus('Closed - Converted');
             leadConvert.setAccountId(testAccount.Id);
-
+        
             Database.LeadConvertResult leadConvertResult = Database.convertLead(leadConvert);
+
+            Lead checkLead = [SELECT Id, IsConverted, ConvertedContactId FROM Lead WHERE Id =: leadConvertResult.getLeadId()];
+
+            List<Lead> newLeadList = new List<Lead>{checkLead};
+
+            // call the method for test
+            LeadTriggerHandler.handleConvertedFromLead(newLeadList, oldLeadMap);
         Test.stopTest();
 
         // check if conversion is success
         Assert.isTrue(leadConvertResult.isSuccess(), 'Lead Conversion is Successful');
 
-        Lead checkLead = [SELECT Id, IsConverted, ConvertedContactId FROM Lead WHERE Id =: leadConvertResult.getLeadId()];
+        
         Assert.isNotNull(checkLead.ConvertedContactId, 'Converted Contact Id should not be null');
         Assert.isTrue(checkLead.IsConverted, 'Lead should be converted');
 

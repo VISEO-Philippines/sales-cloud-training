@@ -44,32 +44,22 @@ public with sharing class LeadTriggerHandler {
     // >>>>>>>>>>>>>>>>>>>>>> US-3
     public static void handleConvertedFromLead(List<Lead> newLeadList, Map<Id, Lead> oldLeadMap) {
 
-        Set<Id> contactIdsToProcess = new Set<Id>();
         // To link the converted lead Ids to the new contact Ids
         Map<Id, Id> leadIdToConvertedContactId = new Map<Id, Id>();
         
         for (Lead lead : newLeadList) {            
-            if (lead.IsConverted && !oldLeadMap.get(lead.Id).IsConverted) {
-                // check if the contact id is not blank
-                if(String.isNotBlank(lead.ConvertedContactId)) {
-                    contactIdsToProcess.add(lead.ConvertedContactId);
-                    // store to map the lead id and converted contact id
-                    leadIdToConvertedContactId.put(lead.ConvertedContactId, lead.Id);
-                }
+            if (lead.IsConverted && !oldLeadMap.get(lead.Id).IsConverted && String.isNotBlank(lead.ConvertedContactId)) {
+                // store to map the lead id and converted contact id
+                leadIdToConvertedContactId.put(lead.ConvertedContactId, lead.Id);
             }
         }
 
-        if(!contactIdsToProcess.isEmpty()) {
+        if(!leadIdToConvertedContactId.isEmpty()) {
             List<Contact> contactsToUpdate = new List<Contact>();
-            Id leadId;
 
-            for (Contact relatedContact : [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :contactIdsToProcess]) {
-                leadId = leadIdToConvertedContactId.containsKey(relatedContact.Id) ? leadIdToConvertedContactId.get(relatedContact.Id) : null;
-                
-                if(relatedContact != null) {
-                    relatedContact.Converted_From_Lead__c = leadId != null ? String.valueOf(leadId) : null;
+            for (Contact relatedContact : [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :leadIdToConvertedContactId.keySet()]) {
+                    relatedContact.Converted_From_Lead__c = leadIdToConvertedContactId.containsKey(relatedContact.Id) ? String.valueOf(leadIdToConvertedContactId.get(relatedContact.Id)) : null;
                     contactsToUpdate.add(relatedContact);
-                }
             }
             update contactsToUpdate;
         }
