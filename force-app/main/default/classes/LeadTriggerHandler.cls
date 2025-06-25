@@ -58,8 +58,10 @@ public with sharing class LeadTriggerHandler {
             List<Contact> contactsToUpdate = new List<Contact>();
 
             for (Contact relatedContact : [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :leadIdToConvertedContactId.keySet()]) {
-                    relatedContact.Converted_From_Lead__c = leadIdToConvertedContactId.containsKey(relatedContact.Id) ? String.valueOf(leadIdToConvertedContactId.get(relatedContact.Id)) : null;
+                if (leadIdToConvertedContactId.containsKey(relatedContact.Id)) { 
+                    relatedContact.Converted_From_Lead__c = String.valueOf(leadIdToConvertedContactId.get(relatedContact.Id));
                     contactsToUpdate.add(relatedContact);
+                }
             }
             update contactsToUpdate;
         }
