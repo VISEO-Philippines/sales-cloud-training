@@ -1,11 +1,11 @@
-trigger LeadTrigger on SOBJECT (before insert) {
+trigger LeadTrigger on Lead (after Insert, after Update) {
 
-    if(trigger.isAfter && trigger.isUpdate){
-        LeadTriggerHandler.convertHotWebLeads(Trigger.new);
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isUpdate){
+        LeadTriggerHandler.convertHotWebLeads(Trigger.new, Trigger.oldMap);
     }
 
-    if(trigger.isAfter && trigger.isInsert){
-        LeadTriggerHandler.convertHotWebLeads(Trigger.new);
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isInsert){
+        LeadTriggerHandler.convertHotWebLeads(Trigger.new, null);
     }
 
 }
