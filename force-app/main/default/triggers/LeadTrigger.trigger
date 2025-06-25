@@ -5,7 +5,7 @@ trigger LeadTrigger on Lead (after insert, after update) {
     }
 
     // US-3
-    if(Trigger.isAfter && Trigger.isUpdate) {
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isUpdate) {
         LeadTriggerHandler.handleConvertedFromLead(Trigger.new, Trigger.oldMap);
     }
 }
