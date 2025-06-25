@@ -5,7 +5,6 @@ public with sharing class OpportunityTriggerHandler {
         Set<Id> opportunityAccountIds = new Set<Id>();
     
         for (Opportunity opp : opportunityList) {
-        {
             if(opp.AccountId <> null){
                 opportunityAccountIds.add(opp.AccountId);
             }
@@ -26,7 +25,7 @@ public with sharing class OpportunityTriggerHandler {
                     IsPrimary = true) 
                 );
             }
-        }
-        insert opportunityContactRolesList; 
-    }
+            insert opportunityContactRolesList;
+    }      
 }
+

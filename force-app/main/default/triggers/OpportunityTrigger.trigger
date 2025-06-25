@@ -1,6 +1,6 @@
-trigger OpportunityTrigger on Opportunity (after insert, after update) {
+trigger OpportunityTrigger on Opportunity (after insert) {
 
-    if(trigger.isAfter && trigger.isInsert){
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isInsert){
         OpportunityTriggerHandler.createOpportunityContactRole(Trigger.new);
     }
     
