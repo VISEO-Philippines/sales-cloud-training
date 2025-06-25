@@ -7,12 +7,11 @@ public with sharing class LeadTriggerHandler {
 
         Map<Id, Lead> freshLeadMap = fetchFreshLeadsByIds(eligibleLeadIds);
         List<Database.LeadConvert> leadsToConvert = buildLeadConvertList(freshLeadMap);
-        Map<Id, Lead> leadReferenceMap = mapLeadIdToLead(freshLeadMap);
 
         if (!leadsToConvert.isEmpty()) {
             List<Database.LeadConvertResult> conversionResults = Database.convertLead(leadsToConvert, false);
             logFailedConversions(conversionResults);
-            updateConvertedContacts(conversionResults, leadReferenceMap);
+            updateConvertedContacts(conversionResults, freshLeadMap);
         }
     }
 
@@ -20,9 +19,23 @@ public with sharing class LeadTriggerHandler {
     private static Set<Id> getEligibleLeadIds(List<Lead> leads, Map<Id, Lead> oldLeadsMap) {
         Set<Id> leadIds = new Set<Id>();
         for (Lead lead : leads) {
-            //update and insert context
-            if ((oldLeadsMap == null || oldLeadsMap.containsKey(lead.Id) && oldLeadsMap.get(lead.Id).Rating != 'Hot' && oldLeadsMap.get(lead.Id).LeadSource != 'Web' )
-            || (oldLeadsMap == null && lead.Rating == 'Hot' && lead.LeadSource == 'Web')) {
+            // Only consider leads with Rating 'Hot' and LeadSource 'Web'
+            if (
+                lead.Rating == 'Hot' && 
+                lead.LeadSource == 'Web' && 
+                (
+                    // Insert context: oldLeadsMap is null
+                    oldLeadsMap == null ||
+                    // Update context: oldLeadsMap contains this lead and either field changed
+                    (
+                        oldLeadsMap.containsKey(lead.Id) && 
+                        (
+                            oldLeadsMap.get(lead.Id).Rating != 'Hot' || 
+                            oldLeadsMap.get(lead.Id).LeadSource != 'Web'
+                        )
+                    )
+                )
+            ) {
                 leadIds.add(lead.Id);
             }
         }
@@ -50,11 +63,6 @@ public with sharing class LeadTriggerHandler {
             }
         }
         return convertList;
-    }
-
-    // ===  Map Lead ID to Lead for future reference ===
-    private static Map<Id, Lead> mapLeadIdToLead(Map<Id, Lead> leads) {
-        return new Map<Id, Lead>(leads);
     }
 
     // ===  Log any failed conversions ===

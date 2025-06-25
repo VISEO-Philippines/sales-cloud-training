@@ -24,7 +24,7 @@ public class LeadTriggerTest {
             FROM Lead 
             WHERE Id = :testLead.Id
         ];
-        System.assertEquals(true, testLead.IsConverted, 'Lead should be converted');
+        Assert.areEqual(true, testLead.IsConverted, 'Lead should be converted');
 
         //Validate contact update
         Contact convertedContact = [
@@ -32,7 +32,7 @@ public class LeadTriggerTest {
             FROM Contact 
             WHERE Id = :testLead.ConvertedContactId
         ];
-        System.assertEquals(testLead.Id, convertedContact.Converted_From_Lead__c, 
+        Assert.areEqual(testLead.Id, convertedContact.Converted_From_Lead__c, 
             'Converted contact should reference the original lead ID.');
     }
 
@@ -65,7 +65,7 @@ public class LeadTriggerTest {
 
         // Query the converted lead
         Lead updatedLead = [SELECT Id, IsConverted, ConvertedContactId FROM Lead WHERE Id = :nonHotLead.Id];
-        System.assert(updatedLead.IsConverted, 'Lead should be converted after update');
+        Assert.isTrue(updatedLead.IsConverted, 'Lead should be converted after update');
 
         // Assert contact was created and linked
         Contact convertedContact = [
@@ -73,7 +73,7 @@ public class LeadTriggerTest {
             FROM Contact 
             WHERE Id = :updatedLead.ConvertedContactId
         ];
-        System.assertEquals(nonHotLead.Id, convertedContact.Converted_From_Lead__c, 
+        Assert.areEqual(nonHotLead.Id, convertedContact.Converted_From_Lead__c, 
             'Converted contact should reference the original lead ID.');
     }
 
