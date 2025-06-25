@@ -5,7 +5,7 @@ public class LeadTriggerHandler {
 
         for(Lead lead : leadsToConvertList) {
             if(!lead.IsConverted && lead.Rating == 'Hot' && lead.LeadSource == 'Web' &&
-               ((oldLeadsMap == null && oldLeadsMap.containsKey(lead.Id) && oldLeadsMap.get(lead.Id).Rating != 'Hot' || oldLeadsMap.get(lead.Id).LeadSource != 'Web') ||
+               ((oldLeadsMap.containsKey(lead.Id) && oldLeadsMap.get(lead.Id).Rating != 'Hot' || oldLeadsMap.get(lead.Id).LeadSource != 'Web') ||
                 oldLeadsMap == NULL)) {
                 Database.LeadConvert leadConvert = new Database.LeadConvert();
                 leadConvert.setLeadId(lead.Id);
