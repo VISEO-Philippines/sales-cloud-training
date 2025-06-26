@@ -1,5 +1,5 @@
 public with sharing class LeadTriggerHandler {
-
+    // >>>>>>>>>>>>>>>>>>>>>> US-1
     public static void convertLeads(List<Lead> leadsToConvertList) {
         // store the lead which will be converted
         List<Lead> filteredLeads = new List<Lead>();
@@ -39,6 +39,31 @@ public with sharing class LeadTriggerHandler {
                 }
             }
         }
+    }
 
+    // >>>>>>>>>>>>>>>>>>>>>> US-3
+    public static void handleConvertedFromLead(List<Lead> newLeadList, Map<Id, Lead> oldLeadMap) {
+
+        // To link the converted lead Ids to the new contact Ids
+        Map<Id, Id> leadIdToConvertedContactId = new Map<Id, Id>();
+        
+        for (Lead lead : newLeadList) {            
+            if (lead.IsConverted && !oldLeadMap.get(lead.Id).IsConverted && String.isNotBlank(lead.ConvertedContactId)) {
+                // store to map the lead id and converted contact id
+                leadIdToConvertedContactId.put(lead.ConvertedContactId, lead.Id);
+            }
+        }
+
+        if(!leadIdToConvertedContactId.isEmpty()) {
+            List<Contact> contactsToUpdate = new List<Contact>();
+
+            for (Contact relatedContact : [SELECT Id, Converted_From_Lead__c FROM Contact WHERE Id IN :leadIdToConvertedContactId.keySet()]) {
+                if (leadIdToConvertedContactId.containsKey(relatedContact.Id)) { 
+                    relatedContact.Converted_From_Lead__c = String.valueOf(leadIdToConvertedContactId.get(relatedContact.Id));
+                    contactsToUpdate.add(relatedContact);
+                }
+            }
+            update contactsToUpdate;
+        }
     }
 }
