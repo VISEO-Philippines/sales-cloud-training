@@ -1,23 +1,102 @@
 public with sharing class LeadTriggerHandler {
-	public static void convertHotWebLeads(List<Lead> leads) {
-        List<Database.LeadConvert> leadConverts = new List<Database.LeadConvert>();
 
+    public static void convertHotWebLeads(List<Lead> leads, Map<Id, Lead> oldLeadsMap) {
+        Set<Id> eligibleLeadIds = getEligibleLeadIds(leads, oldLeadsMap);
+
+        if (eligibleLeadIds.isEmpty()) return;
+
+        Map<Id, Lead> freshLeadMap = fetchFreshLeadsByIds(eligibleLeadIds);
+        List<Database.LeadConvert> leadsToConvert = buildLeadConvertList(freshLeadMap);
+
+        if (!leadsToConvert.isEmpty()) {
+            List<Database.LeadConvertResult> conversionResults = Database.convertLead(leadsToConvert, false);
+            logFailedConversions(conversionResults);
+            updateConvertedContacts(conversionResults, freshLeadMap);
+        }
+    }
+
+    // === Identify eligible leads ===
+    private static Set<Id> getEligibleLeadIds(List<Lead> leads, Map<Id, Lead> oldLeadsMap) {
+        Set<Id> leadIds = new Set<Id>();
         for (Lead lead : leads) {
-            if ((!lead.IsConverted) && (lead.Rating == 'Hot' && lead.LeadSource == 'Web')) {
-                Database.LeadConvert lc = new Database.LeadConvert();
-                lc.setLeadId(lead.Id);
-                lc.setDoNotCreateOpportunity(false); 
-                lc.setConvertedStatus('Closed - Converted'); 
-                leadConverts.add(lc);
+            // Only consider leads with Rating 'Hot' and LeadSource 'Web'
+            if (
+                lead.Rating == 'Hot' && 
+                lead.LeadSource == 'Web' && 
+                (
+                    // Insert context: oldLeadsMap is null
+                    oldLeadsMap == null ||
+                    // Update context: oldLeadsMap contains this lead and either field changed
+                    (
+                        oldLeadsMap.containsKey(lead.Id) && 
+                        (
+                            oldLeadsMap.get(lead.Id).Rating != 'Hot' || 
+                            oldLeadsMap.get(lead.Id).LeadSource != 'Web'
+                        )
+                    )
+                )
+            ) {
+                leadIds.add(lead.Id);
             }
         }
-        
-        List<Database.LeadConvertResult> results = Database.convertLead(leadConverts, false);
-            for (Database.LeadConvertResult result : results) {
-                if (!result.isSuccess()) {
-                    System.debug('Lead conversion failed: ' + result.getErrors());
-                }
+        return leadIds;
+    }
+
+    // === Query fresh lead records ===
+    private static Map<Id, Lead> fetchFreshLeadsByIds(Set<Id> leadIds) {
+        return new Map<Id, Lead>(
+            [SELECT Id, IsConverted, LeadSource, Rating FROM Lead WHERE Id IN :leadIds]
+        );
+    }
+
+    // ===  Prepare convert requests ===
+    private static List<Database.LeadConvert> buildLeadConvertList(Map<Id, Lead> leads) {
+        List<Database.LeadConvert> convertList = new List<Database.LeadConvert>();
+
+        for (Lead lead : leads.values()) {
+            if (!lead.IsConverted) {
+                Database.LeadConvert convertRequest = new Database.LeadConvert();
+                convertRequest.setLeadId(lead.Id);
+                convertRequest.setDoNotCreateOpportunity(false);
+                convertRequest.setConvertedStatus('Closed - Converted');
+                convertList.add(convertRequest);
+            }
         }
-               
+        return convertList;
+    }
+
+    // ===  Log any failed conversions ===
+    private static void logFailedConversions(List<Database.LeadConvertResult> conversionResults) {
+        for (Database.LeadConvertResult result : conversionResults) {
+            if (!result.isSuccess()) {
+                System.debug('Lead conversion failed: ' + result.getErrors());
+            }
+        }
+    }
+
+    // ===  Update converted Contact records ===
+    private static void updateConvertedContacts(List<Database.LeadConvertResult> conversionResults, Map<Id, Lead> originalLeads) {
+        List<Contact> contactsToUpdate = new List<Contact>();
+        Lead sourceLead;
+        for (Database.LeadConvertResult result : conversionResults) {
+            if (result.isSuccess()) {
+                Id leadId = result.getLeadId();
+                Id contactId = result.getContactId();
+
+                if (leadId != null && contactId != null) {
+                    sourceLead = originalLeads.get(leadId);
+                    if (sourceLead != null && sourceLead.LeadSource != null) {
+                        contactsToUpdate.add(new Contact(
+                            Id = contactId,
+                            Converted_From_Lead__c = leadId
+                        ));
+                    }
+                }
+            }
+        }
+
+        if (!contactsToUpdate.isEmpty()) {
+            update contactsToUpdate;
+        }
     }
 }
