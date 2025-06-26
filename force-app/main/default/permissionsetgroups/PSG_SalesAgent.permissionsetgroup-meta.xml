@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permission Set Group for Sales Agents</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>PSG_SalesAgent</label>
+    <permissionSets>Account_CRED</permissionSets>
+    <permissionSets>Contacts_CRED</permissionSets>
+    <permissionSets>Lead_CRED</permissionSets>
+    <permissionSets>Opportunity_CRED</permissionSets>
+    <permissionSets>Pricebook_CRED</permissionSets>
+    <permissionSets>Products_CRED</permissionSets>
+    <permissionSets>force__SalesConsoleUser</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

@@ -4,5 +4,9 @@
         <members>Contact</members>
         <name>CustomObject</name>
     </types>
+        <types>
+        <members>force__SalesConsoleUser</members>
+        <name>PermissionSet</name>
+    </types>
     <version>63.0</version>
 </Package>
