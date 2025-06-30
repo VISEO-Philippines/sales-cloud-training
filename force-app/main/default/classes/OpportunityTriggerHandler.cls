@@ -1,4 +1,7 @@
 public with sharing class OpportunityTriggerHandler {
+
+    private static final String PROPOSAL_PRICE_STAGE_NAME = 'Proposal/Price Quote';
+    
     public static void createOpportunityContactRole(List<Opportunity> opportunities) {
         Set<Id> relatedAccountIds = new Set<Id>();
         List<Opportunity> oppList = new List<Opportunity>();
@@ -38,25 +41,36 @@ public with sharing class OpportunityTriggerHandler {
         }
     }
 
-    public static void generateTaskForOpportunityOwner(List<Opportunity> opportunityList, Map<Id, Opportunity> mapToOldOpportunity){
-    List<Task> taskList = new List<Task>();
+    public static void generateTaskForOpportunityOwner(List<Opportunity> opportunities, Map<Id, Opportunity> mapToOldOpportunity){
+        List<Task> taskList = new List<Task>();
 
-    for (Opportunity opp : opportunityList) {
-
-         if (((mapToOldOpportunity == null || !mapToOldOpportunity.containsKey(opp.Id)) && opp.StageName == 'Proposal/Price Quote') 
-            ||(mapToOldOpportunity != null && mapToOldOpportunity.containsKey(opp.Id) && opp.StageName == 'Proposal/Price Quote' )) {
-            System.debug('Creating Task for Opp ID: ' + opp.Id);
-            taskList.add(new Task(
-                Subject = 'Follow up call',
-                OwnerId = opp.OwnerId,
-                WhatId = opp.Id,
-                ActivityDate = Date.today().addDays(3),
-                Status = 'Not Started',
-                Priority = 'Normal'
-            ));
-        } 
+        for (Opportunity opp : opportunities) {
+            
+            if (
+                opp.StageName == PROPOSAL_PRICE_STAGE_NAME &&
+                (
+                    //Insert context: mapToOldOpportunity is null
+                    mapToOldOpportunity == null ||
+                    //Update context: mapToOldOpportunity contains this map and stage name changed
+                    (
+                        mapToOldOpportunity.containsKey(opp.Id) &&
+                        (
+                            mapToOldOpportunity.get(opp.Id).StageName != PROPOSAL_PRICE_STAGE_NAME
+                        )
+                    )
+                ))
+            {
+                taskList.add(new Task(
+                    Subject = 'Follow up call',
+                    OwnerId = opp.OwnerId,
+                    WhatId = opp.Id,
+                    ActivityDate = Date.today().addDays(3),
+                    Status = 'Not Started',
+                    Priority = 'Normal'
+                ));
+            } 
+        }
+            insert taskList;
     }
-        insert taskList;
-}
 
 }

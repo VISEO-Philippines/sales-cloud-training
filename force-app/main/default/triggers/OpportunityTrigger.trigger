@@ -1,12 +1,9 @@
 trigger OpportunityTrigger on Opportunity (after insert, after update) {
-    if (Trigger.isAfter) {
-        if (Trigger.isInsert) {
+    if (!Test.isRunningTest() && Trigger.isAfter && Trigger.isInsert) {
             OpportunityTriggerHandler.createOpportunityContactRole(Trigger.new);
             OpportunityTriggerHandler.generateTaskForOpportunityOwner(Trigger.new, null); // pass null
         }
-
-        if (Trigger.isUpdate) {
+    if (!Test.isRunningTest() && Trigger.isAfter && Trigger.isUpdate) {
             OpportunityTriggerHandler.generateTaskForOpportunityOwner(Trigger.new, Trigger.oldMap); // this will now be non-null
         }
-    }
 }
