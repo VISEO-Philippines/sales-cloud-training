@@ -52,9 +52,9 @@ public with sharing class OpportunityTriggerHandler {
                     //Insert context: mapToOldOpportunity is null
                     mapToOldOpportunity == null ||
                     //Update context: mapToOldOpportunity contains this map and stage name changed
-                    (
+                    
                         mapToOldOpportunity.get(opp.Id).StageName != PROPOSAL_PRICE_STAGE_NAME
-                    )
+                    
                 ))
             {
                 taskList.add(new Task(
