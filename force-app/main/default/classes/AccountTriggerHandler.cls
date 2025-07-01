@@ -46,7 +46,7 @@ public with sharing class AccountTriggerHandler {
         List<Task> tasks = new List<Task>();
         for (Contact contact : contactsToInsert) {
             Account acc = accountMap.get(contact.AccountId);
-            if (acc != null) {
+            if (accountMap.containsKey(contact.AccountId)) {
                 tasks.add(new Task(
                     Subject = DEFAULT_TASK_SUBJECT,
                     WhatId = contact.AccountId,
