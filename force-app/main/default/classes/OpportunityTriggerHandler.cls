@@ -4,8 +4,7 @@ public with sharing class OpportunityTriggerHandler {
         List<Task> tasksToInsert = new List<Task>();
         
         for(Opportunity opp : oppListToUpdate) {
-            if((oldOppMap == null && opp.StageName == 'Proposal/Price Quote') || 
-               (oldOppMap != null && oldOppMap.get(opp.Id) != null && opp.StageName == 'Proposal/Price Quote' && oldOppMap.get(opp.Id).StageName != 'Proposal/Price Quote')) {
+            if(opp.StageName == 'Proposal/Price Quote' && (oldOppMap == null || oldOppMap.get(opp.Id).StageName != 'Proposal/Price Quote')) {
                 tasksToInsert.add(
                     new Task(
                         Subject = 'Follow up on Opportunity: ' + opp.Name,
