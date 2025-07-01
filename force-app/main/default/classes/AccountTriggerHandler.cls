@@ -45,13 +45,12 @@ public with sharing class AccountTriggerHandler {
     private static List<Task> createTasks(List<Contact> contactsToInsert, Map<Id, Account> accountMap) {
         List<Task> tasks = new List<Task>();
         for (Contact contact : contactsToInsert) {
-            Account acc = accountMap.get(contact.AccountId);
             if (accountMap.containsKey(contact.AccountId)) {
                 tasks.add(new Task(
                     Subject = DEFAULT_TASK_SUBJECT,
                     WhatId = contact.AccountId,
                     WhoId = contact.Id,
-                    OwnerId = acc.OwnerId
+                    OwnerId = accountMap.get(contact.AccountId).OwnerId
                 ));
             }
         }
