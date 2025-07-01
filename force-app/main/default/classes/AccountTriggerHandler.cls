@@ -15,18 +15,13 @@ public with sharing class AccountTriggerHandler {
             return;
         }
 
-        Map<Id, Contact> contactByAccountIdMap = new Map<Id, Contact>();
-        for (Contact contact : contactsToInsert) {
-            contactByAccountIdMap.put(contact.AccountId, contact);
-        }
-
         //used to get ownerId
         Map<Id, Account> accountMap = new Map<Id, Account>();
         for (Account acc : newAccounts) {
             accountMap.put(acc.Id, acc);
         }
 
-        List<Task> tasksToInsert = createTasks(contactByAccountIdMap, accountMap);
+        List<Task> tasksToInsert = createTasks(contactsToInsert, accountMap);
 
         try {
             insert tasksToInsert;
@@ -47,17 +42,18 @@ public with sharing class AccountTriggerHandler {
         return contacts;
     }
 
-    private static List<Task> createTasks(Map<Id, Contact> contactByAccountId, Map<Id, Account> accountMap) {
+    private static List<Task> createTasks(List<Contact> contactsToInsert, Map<Id, Account> accountMap) {
         List<Task> tasks = new List<Task>();
-        for (Id accountId : contactByAccountId.keySet()) {
-            Contact contact = contactByAccountId.get(accountId);
-            Account acc = accountMap.get(accountId);
-            tasks.add(new Task(
-                Subject = DEFAULT_TASK_SUBJECT,
-                WhatId = accountId,
-                WhoId = contact.Id,
-                OwnerId = acc.OwnerId
-            ));
+        for (Contact contact : contactsToInsert) {
+            Account acc = accountMap.get(contact.AccountId);
+            if (acc != null) {
+                tasks.add(new Task(
+                    Subject = DEFAULT_TASK_SUBJECT,
+                    WhatId = contact.AccountId,
+                    WhoId = contact.Id,
+                    OwnerId = acc.OwnerId
+                ));
+            }
         }
         return tasks;
     }
