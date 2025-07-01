@@ -53,10 +53,7 @@ public with sharing class OpportunityTriggerHandler {
                     mapToOldOpportunity == null ||
                     //Update context: mapToOldOpportunity contains this map and stage name changed
                     (
-                        mapToOldOpportunity.containsKey(opp.Id) &&
-                        (
-                            mapToOldOpportunity.get(opp.Id).StageName != PROPOSAL_PRICE_STAGE_NAME
-                        )
+                        mapToOldOpportunity.get(opp.Id).StageName != PROPOSAL_PRICE_STAGE_NAME
                     )
                 ))
             {
