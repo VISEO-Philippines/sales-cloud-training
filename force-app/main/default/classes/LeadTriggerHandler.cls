@@ -25,7 +25,7 @@ public class LeadTriggerHandler {
 	List<Contact> contactsToUpdate = new List<Contact>();
     Map<Id, Id> contactIdFromConversion = new Map<Id, Id>();
      
-        for(Lead cLeads : leadsList) {`
+        for(Lead cLeads : leadsList) {
 
             if(cLeads.IsConverted && oldLeadsMap.get(cLeads.Id).ConvertedContactId == null && cLeads.ConvertedContactId != null){
                 contactIdFromConversion.put(cLeads.ConvertedContactId, cLeads.Id);	
