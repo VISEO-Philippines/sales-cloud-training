@@ -15,16 +15,14 @@ global class OPP_BTCH_FlagAccountAsClient implements Database.Batchable<SObject>
     global void execute(Database.BatchableContext BC, List<SObject> scope) {
         Set<Id> accountIdsToUpdate = new Set<Id>();
         for (Opportunity opp : (List<Opportunity>) scope) {
-            if (opp.AccountId != null) {
                 accountIdsToUpdate.add(opp.AccountId);
-            }
         }
 
         if (accountIdsToUpdate.isEmpty()) return;
 
         List<Account> accountsToUpdate = new List<Account>();
 
-        for (Account acc : [SELECT Id FROM Account WHERE Id IN :accountIdsToUpdate]) {
+        for (Account acc : [SELECT Id, Is_Client__c FROM Account WHERE Id IN :accountIdsToUpdate]) {
             acc.Is_Client__c = true;
             accountsToUpdate.add(acc);
         }
