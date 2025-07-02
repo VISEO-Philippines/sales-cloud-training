@@ -37,4 +37,33 @@ public with sharing class OpportunityTriggerHandler {
             insert newOppConRole;
         }
     }
+
+    public static void generateTaskForOpportunityOwner(List<Opportunity> opportunityList, Map<Id, Opportunity> mapToOldOpportunity){
+    List<Task> taskList = new List<Task>();
+
+    for (Opportunity opp : opportunityList) {
+
+         if (((mapToOldOpportunity == null || !mapToOldOpportunity.containsKey(opp.Id)) && opp.StageName == 'Proposal/Price Quote') 
+            ||(mapToOldOpportunity != null && mapToOldOpportunity.containsKey(opp.Id) && mapToOldOpportunity.get(opp.Id).StageName != 'Proposal/Price Quote' && opp.StageName == 'Proposal/Price Quote' )) {
+            System.debug('Creating Task for Opp ID: ' + opp.Id);
+            taskList.add(new Task(
+                Subject = 'Follow up call',
+                OwnerId = opp.OwnerId,
+                WhatId = opp.Id,
+                ActivityDate = Date.today().addDays(3),
+                Status = 'Not Started',
+                Priority = 'Normal'
+            ));
+        } 
+    }
+        insert taskList;
+}
+
+    public static void preventDeleteOfClosedWonOpportunities(List<Opportunity> opportunityList){
+        for (Opportunity opp : opportunityList) {
+            if (opp.StageName == 'Closed Won') {
+                opp.addError('You can\'t delete Opportunity with StageName: Closed Won');
+            }
+        } 
+    }
 }
