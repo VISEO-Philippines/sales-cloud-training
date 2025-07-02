@@ -22,15 +22,15 @@ public class ContactUtilsTest {
         Map<Id, Integer> resultMap = ContactUtils.getOpportunityCountByContact(contacts);
         Test.stopTest();
 
-        System.assertEquals(2, resultMap.get(contact1.Id), 'Contact 1 should have 2 opps from acc1');
-        System.assertEquals(1, resultMap.get(contact2.Id), 'Contact 2 should have 1 opp from acc2');
-        System.assertEquals(1, resultMap.get(contact3.Id), 'Contact 3 shares acc2 and should also have 1 opp');
+        Assert.areEqual(2, resultMap.get(contact1.Id), 'Contact 1 should have 2 opps from acc1');
+        Assert.areEqual(1, resultMap.get(contact2.Id), 'Contact 2 should have 1 opp from acc2');
+        Assert.areEqual(1, resultMap.get(contact3.Id), 'Contact 3 shares acc2 and should also have 1 opp');
 
         Contact contactNoAcc = new Contact(FirstName = 'No', LastName = 'Account');
         insert contactNoAcc;
         contacts.add(contactNoAcc);
 
         resultMap = ContactUtils.getOpportunityCountByContact(contacts);
-        System.assertEquals(0, resultMap.get(contactNoAcc.Id), 'Contact with no Account should return 0 opps');
+        Assert.areEqual(0, resultMap.get(contactNoAcc.Id), 'Contact with no Account should return 0 opps');
     }
 }
