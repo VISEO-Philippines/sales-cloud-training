@@ -1,10 +1,16 @@
 public with sharing class OpportunityHelperClass {
-    public static void sendEmailAfterOppClosedWonWithSpecificAmount(List<Opportunity> opportunities) {
+    
+    private static final String CLOSED_WON_STAGE_NAME = 'Closed Won';
+
+    public static void sendEmailAfterOppClosedWonWithSpecificAmount(List<Opportunity> opportunities,  Map<Id, Opportunity> mapToOldOpportunity) {
 
         Set<Id> oppIds = new Set<Id>();
         Decimal deal = 500000;
         for(Opportunity opp : opportunities){
-            if(opp.StageName == 'Closed Won' && (opp.Amount != null && opp.Amount > deal)){
+            if(opp.StageName == CLOSED_WON_STAGE_NAME && opp.Amount > deal &&
+                (mapToOldOpportunity == null || 
+                (mapToOldOpportunity.get(opp.Id).StageName != CLOSED_WON_STAGE_NAME )))
+                    {
                 oppIds.add(opp.Id);
             }
         }

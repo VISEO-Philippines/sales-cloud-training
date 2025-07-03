@@ -28,11 +28,11 @@ public class OpportunityHelperTest {
         insert opportunities;
 
         Test.startTest();
-        OpportunityHelperClass.sendEmailAfterOppClosedWonWithSpecificAmount(opportunities);
+        OpportunityHelperClass.sendEmailAfterOppClosedWonWithSpecificAmount(opportunities, null);
         Test.stopTest();
 
         // assert if atleast 1 email has been sent
-        System.assertEquals(1, Limits.getEmailInvocations(), 'One email should be sent');
+        Assert.areEqual(1, Limits.getEmailInvocations(), 'One email should be sent');
     }
 }
 
