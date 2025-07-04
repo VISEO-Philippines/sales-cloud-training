@@ -72,11 +72,6 @@ private class OpportunityTriggerHandlerTest {
         );
         insert testOppConRole;
 
-        System.debug('--- START testAddPrimaryContactRole ---');
-        System.debug('Opportunity ID for test: ' + testOppConRole.Id);
-        Integer initialRoleCount = [SELECT COUNT() FROM OpportunityContactRole WHERE OpportunityId = :testOppConRole.Id];
-        System.debug('Initial OCR count for ' + testOppConRole.Id + ': ' + initialRoleCount);
-
         Test.startTest();
             OpportunityTriggerHandler.addPrimaryContactRole(new List<Opportunity>{testOppConRole});
         Test.stopTest();
