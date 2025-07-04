@@ -4,7 +4,6 @@ public with sharing class AccountTriggerHandler {
     private static final String DEFAULT_TASK_SUBJECT = 'New Task';
 
     public static void createDefaultContactAndTaskForAccounts(List<Account> newAccounts) {
-        if (newAccounts == null || newAccounts.isEmpty()) return;
 
         List<Contact> contactsToInsert = createContacts(newAccounts);
 
