@@ -24,7 +24,7 @@ private class LeadTriggerHandlerTest {
         assert.areEqual(1, result.size(), 'These should be 1 Contact Created after Convertion');
     
     }
-
+  
     @isTest
     static void testCheckForConvertedLeads() {
         

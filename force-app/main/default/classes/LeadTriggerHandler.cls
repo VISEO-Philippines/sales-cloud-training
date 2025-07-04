@@ -19,7 +19,7 @@ public class LeadTriggerHandler {
             }
         }
     }
-    
+
     public static void checkLeadsIfConverted(List<Lead> leadsList, Map<Id, Lead> oldLeadsMap){
 
 	List<Contact> contactsToUpdate = new List<Contact>();
