@@ -14,7 +14,7 @@ public class OpportunityBatchHandler implements Database.Batchable<SObject> {
 				accountIds.add(opp.AccountId);
                 Account acc = new Account(
                 Id = opp.AccountId,
-                Is_Client__c = true
+                Is_Client__c = false
                 );
                     accountToUpdate.add(acc);
             }
