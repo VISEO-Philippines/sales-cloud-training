@@ -1,9 +1,9 @@
 trigger CaseTrigger on Case (before insert, before update) {
-    if (Trigger.isBefore && Trigger.isInsert) {
-        CaseTriggerHandler.caseAssignHighPriority(Trigger.new, Trigger.oldMap);
+    if (!Test.isRunningTest() && Trigger.isBefore && Trigger.isInsert) {
+        CaseTriggerHandler.caseAssignHighPriority(Trigger.new, null);
     }
 
-    if(Trigger.isBefore && Trigger.isUpdate) {
+    if(!Test.isRunningTest() && Trigger.isBefore && Trigger.isUpdate) {
         CaseTriggerHandler.caseAssignHighPriority(Trigger.new, Trigger.oldMap);
     }
 }

@@ -7,6 +7,8 @@ public with sharing class CaseTriggerHandler {
                 highPrioCases.add(cs);
             }
         }
+
+        if(highPrioCases.isEmpty()) return;
         
         // VIP Support Queue group for high-priority case assignment
         Group vipQueue = [
