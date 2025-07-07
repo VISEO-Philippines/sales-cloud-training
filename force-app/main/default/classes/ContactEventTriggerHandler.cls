@@ -29,7 +29,7 @@ public with sharing class ContactEventTriggerHandler {
 
         // log the Contact to the custom object 
         for(Contact conToLog : deserializedContacts) {
-            String accountName = accountMap.containsKey(conToLog.AccountId) ? accountMap.get(conToLog.AccountId).Name : null;
+            String accountName = !accountMap.isEmpty() ? accountMap.get(conToLog.AccountId).Name : null;
             contactToLogList.add(new Contact_Delete_Log__c(
                 Name = conToLog.FirstName + ' ' + conToLog.LastName,
                 AccountName__c = accountName,

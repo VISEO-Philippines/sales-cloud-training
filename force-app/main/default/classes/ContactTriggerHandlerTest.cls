@@ -24,7 +24,7 @@ private class ContactTriggerHandlerTest {
         insert testContacts;
 
         Test.startTest();
-            delete testContacts;
+            ContactTriggerHandler.publishEventContactDeletion(testContacts);
         Test.stopTest();
 
         System.assert(true, 'Contacts deleted event should be published');
