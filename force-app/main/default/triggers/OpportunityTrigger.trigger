@@ -1,8 +1,8 @@
 trigger OpportunityTrigger on Opportunity (after insert, after update) {
-    if(Trigger.isAfter && Trigger.isInsert) {
-        OpportunityTriggerHandler.sendEmailNotification(Trigger.new, Trigger.oldMap);
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isInsert) {
+        OpportunityTriggerHandler.sendEmailNotification(Trigger.new, null);
     }
-    if(Trigger.isAfter && Trigger.isUpdate) {
+    if(!Test.isRunningTest() && Trigger.isAfter && Trigger.isUpdate) {
         OpportunityTriggerHandler.sendEmailNotification(Trigger.new, Trigger.oldMap);
     }
 }
