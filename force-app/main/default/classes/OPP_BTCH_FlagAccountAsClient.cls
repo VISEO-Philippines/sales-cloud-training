@@ -8,11 +8,10 @@ global class OPP_BTCH_FlagAccountAsClient implements Database.Batchable<SObject>
             FROM Opportunity 
             WHERE StageName = :CLOSED_WON_STAGE_NAME
                   AND Account.Is_Client__c = false
-                  AND AccountId != null
         ]);
     }
 
-    global void execute(Database.BatchableContext BC, List<SObject> scope) {
+    global void execute(Database.BatchableContext BC, List<Opportunity> scope) {
         Set<Id> accountIdsToUpdate = new Set<Id>();
         for (Opportunity opp : (List<Opportunity>) scope) {
                 accountIdsToUpdate.add(opp.AccountId);
