@@ -11,15 +11,17 @@ public with sharing class CaseTriggerHandler {
         if(highPrioCases.isEmpty()) return;
         
         // VIP Support Queue group for high-priority case assignment
-        Group vipQueue = [
+        List<Group> vipQueue = [
             SELECT Id
             FROM Group
             WHERE Name = 'VIP Support Queue' AND Type = 'Queue' LIMIT 1
         ];
 
+        if(vipQueue.isEmpty()) return;
+
         // assigning case to the VIP Support Queue for high-priority cases
         for(Case cs : highPrioCases) {
-            cs.OwnerId = vipQueue.Id;
+            cs.OwnerId = vipQueue[0].Id;
         }
     }
 }
