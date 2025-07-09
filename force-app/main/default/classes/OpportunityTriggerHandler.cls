@@ -1,5 +1,27 @@
 public with sharing class OpportunityTriggerHandler {
+    // US-6
+    public static void taskCreateOnStageProposal(List<Opportunity> oppListToUpdate, Map<Id, Opportunity> oldOppMap) {
+        
+        List<Task> tasksToInsert = new List<Task>();
+        
+        for(Opportunity opp : oppListToUpdate) {
+            if(opp.StageName == 'Proposal/Price Quote' && (oldOppMap == null || oldOppMap.get(opp.Id).StageName != 'Proposal/Price Quote')) {
+                tasksToInsert.add(
+                    new Task(
+                        Subject = 'Follow up on Opportunity: ' + opp.Name,
+                        OwnerId = opp.OwnerId,
+                        WhoId = opp.ContactId,
+                        WhatId = opp.Id,
+                        ActivityDate = Date.today() + 3,
+                        Status = 'Open'
+                    )
+                );
+            }
+        }
+        insert tasksToInsert;
+    }
 
+    // US-2
     public static void addPrimaryContactRole(List<Opportunity> newOpportunityList) {
         List<OpportunityContactRole> contactRolesToInsertList = new List<OpportunityContactRole>();
         List<Opportunity> oppWithAccounts = new List<Opportunity>();
@@ -39,9 +61,7 @@ public with sharing class OpportunityTriggerHandler {
                 contactRolesToInsertList.add(conRole);
             }
         }
-
         // insert if there are contact roles inside the list
         insert contactRolesToInsertList;
-
     }
 }
