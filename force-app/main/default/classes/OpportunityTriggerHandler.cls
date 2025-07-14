@@ -1,4 +1,7 @@
 public with sharing class OpportunityTriggerHandler {
+
+    private static final String PROPOSAL_PRICE_STAGE_NAME = 'Proposal/Price Quote';
+    
     public static void createOpportunityContactRole(List<Opportunity> opportunities) {
         Set<Id> relatedAccountIds = new Set<Id>();
         List<Opportunity> oppList = new List<Opportunity>();
@@ -37,4 +40,32 @@ public with sharing class OpportunityTriggerHandler {
             insert newOppConRole;
         }
     }
+
+    public static void generateTaskForOpportunityOwner(List<Opportunity> opportunities, Map<Id, Opportunity> mapToOldOpportunity){
+        List<Task> taskList = new List<Task>();
+
+        for (Opportunity opp : opportunities) {
+            
+            if (
+                opp.StageName == PROPOSAL_PRICE_STAGE_NAME &&
+                (
+                //Insert context: mapToOldOpportunity is null
+                mapToOldOpportunity == null ||
+                //Update context: mapToOldOpportunity contains this map and stage name changed
+                mapToOldOpportunity.get(opp.Id).StageName != PROPOSAL_PRICE_STAGE_NAME
+                ))
+            {
+                taskList.add(new Task(
+                    Subject = 'Follow up call',
+                    OwnerId = opp.OwnerId,
+                    WhatId = opp.Id,
+                    ActivityDate = Date.today().addDays(3),
+                    Status = 'Not Started',
+                    Priority = 'Normal'
+                ));
+            } 
+        }
+            insert taskList;
+    }
+
 }

@@ -1,8 +1,9 @@
 @isTest
 public class LeadTriggerTest {
+
     @isTest
-    static void testConvertHotWebLeads() {
-        // Create a test Lead
+    static void testInsertedHotWebLeads() {
+        // Create a test Lead record
         Lead testLead = new Lead(
             FirstName = 'Test',
             LastName = 'Lead',
@@ -14,8 +15,66 @@ public class LeadTriggerTest {
         insert testLead;
 
         Test.startTest();
-        testLead = [SELECT Id, IsConverted FROM Lead WHERE Id = :testLead.Id];
-        System.assert(testLead.IsConverted, 'The lead should be converted.');
+        LeadTriggerHandler.convertHotWebLeads(new List<Lead>{ testLead }, null);
         Test.stopTest();
+
+        //Re-query to assert conversion
+        testLead = [
+            SELECT Id, IsConverted, ConvertedContactId 
+            FROM Lead 
+            WHERE Id = :testLead.Id
+        ];
+        Assert.areEqual(true, testLead.IsConverted, 'Lead should be converted');
+
+        //Validate contact update
+        Contact convertedContact = [
+            SELECT Id, Converted_From_Lead__c 
+            FROM Contact 
+            WHERE Id = :testLead.ConvertedContactId
+        ];
+        Assert.areEqual(testLead.Id, convertedContact.Converted_From_Lead__c, 
+            'Converted contact should reference the original lead ID.');
     }
+
+
+    @isTest
+    static void testUpdateToHotWebLeads() {
+        // Insert lead with non-qualifying values
+        Lead nonHotLead = new Lead(
+            FirstName = 'Test',
+            LastName = 'Update',
+            Company = 'UpdateCo',
+            Rating = 'Warm',
+            LeadSource = 'Other',
+            Status = 'Open - Not Contacted'
+        );
+        insert nonHotLead;
+
+        // Clone old lead to simulate oldMap
+        Lead oldVersion = nonHotLead.clone();
+        Map<Id, Lead> oldMap = new Map<Id, Lead>{ nonHotLead.Id => oldVersion };
+        // Modify lead fields 
+        nonHotLead.Rating = 'Hot';
+        nonHotLead.LeadSource = 'Web';
+        update nonHotLead;
+        // Call handler directly to simulate trigger logic after update
+
+        Test.startTest();
+        LeadTriggerHandler.convertHotWebLeads(new List<Lead>{ nonHotLead }, oldMap);
+        Test.stopTest();
+
+        // Query the converted lead
+        Lead updatedLead = [SELECT Id, IsConverted, ConvertedContactId FROM Lead WHERE Id = :nonHotLead.Id];
+        Assert.isTrue(updatedLead.IsConverted, 'Lead should be converted after update');
+
+        // Assert contact was created and linked
+        Contact convertedContact = [
+            SELECT Id, Converted_From_Lead__c 
+            FROM Contact 
+            WHERE Id = :updatedLead.ConvertedContactId
+        ];
+        Assert.areEqual(nonHotLead.Id, convertedContact.Converted_From_Lead__c, 
+            'Converted contact should reference the original lead ID.');
+    }
+
 }
