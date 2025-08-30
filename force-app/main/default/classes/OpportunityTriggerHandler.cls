@@ -1,40 +1,50 @@
 public with sharing class OpportunityTriggerHandler {
-    public static void createOpportunityContactRole(List<Opportunity> opportunities) {
-        Set<Id> relatedAccountIds = new Set<Id>();
-        List<Opportunity> oppList = new List<Opportunity>();
+
+    public static void createOpportunityContactRole(List<Opportunity> opportunityList) {
+
+        Set<Id> opportunityAccountIds = new Set<Id>();
+        List<OpportunityContactRole> opportunityContactRolesList = new List<OpportunityContactRole>();
         
-        for (Opportunity opp : opportunities) {
-            if (opp.AccountId != null) {
-                relatedAccountIds.add(opp.AccountId);
-                oppList.add(opp);
+        for(Opportunity opp : opportunityList) {
+        {
+            if(opp.AccountId <> null){
+                opportunityAccountIds.add(opp.AccountId);
             }
         }
-        
-        // Map to store the related account's first contact
-        Map<Id, Contact> accountIdToContactsMap = new Map<Id, Contact>();
+        List<Contact> contactList = [SELECT Id, AccountId FROM Contact WHERE AccountId IN : opportunityAccountIds];
 
-        // Query the contacts of each account (1 contact per account)
-        for (Account acc : [SELECT Id, (SELECT Id FROM Contacts LIMIT 1) FROM Account WHERE Id IN :relatedAccountIds]) {
-            for (Contact con : acc.Contacts) {
-                accountIdToContactsMap.put(acc.Id, con);
-            }
-        }
-
-        // Assign OpportunityContactRoles to Opps
-        List<OpportunityContactRole> newOppConRole = new List<OpportunityContactRole>();
-        
-        for(Opportunity opp : oppList) {
-            if(accountIdToContactsMap.containsKey(opp.AccountId)) {
-                newOppConRole.add(new OpportunityContactRole(
+        for(Contact con :contactList) {
+            opportunityContactRolesList.add(
+                new OpportunityContactRole(
                     OpportunityId = opp.Id,
-                    ContactId =  accountIdToContactsMap.get(opp.AccountId).Id,
-                    IsPrimary = true
-                ));
+                    ContactId = con.Id,
+                    Role = 'Business User',
+                    IsPrimary = true) 
+                );
             }
         }
+        insert opportunityContactRolesList; 
+    }
 
-        if (!newOppConRole.isEmpty()) {
-            insert newOppConRole;
+    public static void createTaskWhenOppStageProposalPriceQuote(List<Opportunity> opportunityList, Map<Id, Opportunity> oldOpportunityMap) {
+        
+        List<Task> createFollowUpTasksList = new List<Task>(); 
+
+        for(Opportunity opp : opportunityList){
+            if(oldOpportunityMap != null && opp.StageName == 'Proposal/Price Quote' && oldOpportunityMap.get(opp.Id).StageName != 'Proposal/Price Quote'){
+                        Task reminderTask = new Task(
+                        OwnerId = opp.OwnerId,
+                        WhatId = opp.Id,
+                        Subject = 'Email',
+                        TaskSubtype = 'Task',
+                        Status = 'Not Started',
+                        ActivityDate = Date.today(),
+                        ReminderDateTime = Date.today() + 3,
+                        IsReminderSet = true
+                    );
+                    createFollowUpTasksList.add(reminderTask);
+            }
         }
+        insert createFollowUpTasksList;
     }
 }
